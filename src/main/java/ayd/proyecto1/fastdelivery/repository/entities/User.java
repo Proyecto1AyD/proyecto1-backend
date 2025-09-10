@@ -1,7 +1,12 @@
 package ayd.proyecto1.fastdelivery.repository.entities;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
+
+@Getter
+@Setter
 @Table(name = "usuario")
 @Entity
 public class User {

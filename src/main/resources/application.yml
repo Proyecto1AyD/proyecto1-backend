@@ -7,21 +7,20 @@ spring:
     url: 'jdbc:mariadb://localhost:3306/fastdelivery'
     username: diego
     password: diego18
-    mail:
-      issue: C�digo de Verificaci�n
-      message: Código para iniciar sesión
-      host: smtp.gmail.com
-      port: 587
-      username: deepgptsolutions@gmail.com
-      password: bypr fpxa vzpm ywpr
-      properties:
-        mail:
-          smtp:
-            auth: true
-            starttls:
-              enable: true
-      approval:
-        issue: Credenciales de Acceso
-        message: Tu cuenta ha sido aprobada. Estas son tus credenciales
   mail:
+    issue: C�digo de Verificaci�n
+    message: Código para iniciar sesión
+    host: smtp.gmail.com
+    port: 587
+    username: deepgptsolutions@gmail.com
+    password: bypr fpxa vzpm ywpr
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+    approval:
+      issue: Credenciales de Acceso
+      message: Tu cuenta ha sido aprobada. Estas son tus credenciales
     recovery_subject: C�digo de Recuperaci�n de Contrase�a.
