@@ -1,25 +1,22 @@
 package ayd.proyecto1.fastdelivery.repository.entities;
 
-
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
-
+import java.util.List;
 
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
-@Table(name = "rol")
 @Entity
-public class Role {
+@Table(name = "ContractStatus")
+public class ContractStatus {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    private String role;
+    private String status;
 
+    @OneToMany(mappedBy = "status", fetch = FetchType.LAZY)
+    private List<Contract> contracts;
 }

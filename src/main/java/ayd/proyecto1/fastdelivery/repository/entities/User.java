@@ -15,7 +15,6 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "nombre")
     private String name;
 
     private String username;
@@ -24,19 +23,14 @@ public class User {
 
     private String password;
 
-    @Column(name = "telefono")
     private String phone;
 
-    @Column(name = "direccion")
     private String address;
 
-    @Column(name = "autenticacion")
-    private Boolean autentication = Boolean.TRUE;
-
+    private Boolean authentication = Boolean.FALSE;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_rol",referencedColumnName = "id")
+    @JoinColumn(name = "id_role", referencedColumnName = "id")
     private Role role;
-
 
 }
