@@ -4,9 +4,7 @@ import ayd.proyecto1.fastdelivery.dto.request.LoginDto;
 import ayd.proyecto1.fastdelivery.dto.request.NewUserDto;
 import ayd.proyecto1.fastdelivery.dto.response.ResponseSuccessfullyDto;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/user")
 public interface UserApi {
@@ -18,5 +16,10 @@ public interface UserApi {
 
     @PostMapping("/login")
     ResponseEntity<ResponseSuccessfullyDto> login(@RequestBody LoginDto loginDto);
+
+
+    @PostMapping("/test/{nombre}")
+    ResponseEntity<ResponseSuccessfullyDto> prueba(@RequestBody LoginDto loginDto, @RequestHeader(value = "token") String token,@RequestParam("id") String id,
+                @PathVariable("nombre") String nombre);
 
 }

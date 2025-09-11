@@ -4,9 +4,9 @@ spring:
   application:
     name: fastdelivery
   datasource:
-    url: 'jdbc:mariadb://localhost:3306/fastdelivery'
-    username: diego
-    password: diego18
+    url: 'jdbc:mysql://metro.proxy.rlwy.net:15941/fastdelivery?useSSL=true&allowPublicKeyRetrieval=true&serverTimezone=UTC'
+    username: root
+    password: qjwKPuQfrgABbChcQCozipfLeCgijzSF
   mail:
     issue: C�digo de Verificaci�n
     message: Código para iniciar sesión

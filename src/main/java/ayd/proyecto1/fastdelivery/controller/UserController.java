@@ -8,6 +8,7 @@ import ayd.proyecto1.fastdelivery.dto.response.ResponseSuccessfullyDto;
 import ayd.proyecto1.fastdelivery.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -31,4 +32,18 @@ public class UserController implements UserApi {
         ResponseSuccessfullyDto responseSuccessfullyDto = userService.login(loginDto);
         return new ResponseEntity<>(responseSuccessfullyDto, responseSuccessfullyDto.getCode());
     }
+
+    @Override
+    public ResponseEntity<ResponseSuccessfullyDto> prueba(LoginDto loginDto, String token, String id, String nombre) {
+        log.info("user/test");
+        ResponseSuccessfullyDto responseSuccessfullyDto = ResponseSuccessfullyDto
+                .builder()
+                .code(HttpStatus.OK)
+                .message("Alex ha sido agregado al sistema")
+                .build();
+
+        return new ResponseEntity<>(responseSuccessfullyDto,responseSuccessfullyDto.getCode());
+    }
+
+
 }

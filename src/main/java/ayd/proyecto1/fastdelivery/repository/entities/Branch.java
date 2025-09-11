@@ -20,10 +20,4 @@ public class Branch {
     private String address;
 
     private String phone;
-
-    @OneToMany(mappedBy = "branch", fetch = FetchType.LAZY)
-    private List<Coordinator> coordinators;
-
-    @OneToMany(mappedBy = "branch", fetch = FetchType.LAZY)
-    private List<DeliveryPerson> deliveryPeople;
 }
