@@ -11,7 +11,7 @@ import java.util.Optional;
 public interface UserCrud extends JpaRepository<User, Integer> {
 
 
-    @Query(value = "select * from usuario where username = ? ;", nativeQuery = true)
+    @Query(value = "select * from user where username = ? ;", nativeQuery = true)
     Optional<User> getUserByUsername(String username);
 
 }
