@@ -2,9 +2,11 @@ package ayd.proyecto1.fastdelivery.service;
 
 import ayd.proyecto1.fastdelivery.dto.request.LoginDto;
 import ayd.proyecto1.fastdelivery.dto.request.NewUserDto;
+import ayd.proyecto1.fastdelivery.dto.request.ValidateCodeDto;
 import ayd.proyecto1.fastdelivery.dto.response.ResponseSuccessfullyDto;
 import ayd.proyecto1.fastdelivery.exception.BusinessException;
 import ayd.proyecto1.fastdelivery.repository.crud.UserCrud;
+import ayd.proyecto1.fastdelivery.repository.entities.Role;
 import ayd.proyecto1.fastdelivery.repository.entities.User;
 import ayd.proyecto1.fastdelivery.utils.GeneralUtils;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +28,8 @@ public class UserService {
 
     private final EmailService emailService;
 
+    private final RoleService roleService;
+
 
 
     public ResponseSuccessfullyDto createUser(NewUserDto newUserDto){
@@ -38,7 +42,8 @@ public class UserService {
         user.setPassword(utils.hashPassword(newUserDto.getPassword()));
         user.setPhone(newUserDto.getTelefono());
         user.setAddress(newUserDto.getDireccion());
-        // TODO pendiente agregarle el ROL al usuario.
+        Role role = roleService.getRoleById(newUserDto.getRol());
+        user.setRole(role);
 
         try{
             userCrud.save(user);
@@ -75,6 +80,12 @@ public class UserService {
                 .build();
     }
 
+    public ResponseSuccessfullyDto validateCode(ValidateCodeDto validateCodeDto){
 
+        if(!validateCodeDto.getCode().equals("1234")){
+            throw new BusinessException(HttpStatus.UNAUTHORIZED,"The code is invalid.");
+        }
 
+        return ResponseSuccessfullyDto.builder().code(HttpStatus.ACCEPTED).message("the code is valid").build();
+    }
 }

@@ -2,6 +2,7 @@ package ayd.proyecto1.fastdelivery.controller.api;
 
 import ayd.proyecto1.fastdelivery.dto.request.LoginDto;
 import ayd.proyecto1.fastdelivery.dto.request.NewUserDto;
+import ayd.proyecto1.fastdelivery.dto.request.ValidateCodeDto;
 import ayd.proyecto1.fastdelivery.dto.response.ResponseSuccessfullyDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,10 @@ public interface UserApi {
 
     @PostMapping("/login")
     ResponseEntity<ResponseSuccessfullyDto> login(@RequestBody LoginDto loginDto);
+
+
+    @PostMapping("/code")
+    ResponseEntity<ResponseSuccessfullyDto> validateToken(@RequestBody ValidateCodeDto validateCodeDto);
 
 
     @PostMapping("/test/{nombre}")

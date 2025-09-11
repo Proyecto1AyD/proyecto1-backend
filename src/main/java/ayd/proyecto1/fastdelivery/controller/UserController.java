@@ -4,6 +4,7 @@ package ayd.proyecto1.fastdelivery.controller;
 import ayd.proyecto1.fastdelivery.controller.api.UserApi;
 import ayd.proyecto1.fastdelivery.dto.request.LoginDto;
 import ayd.proyecto1.fastdelivery.dto.request.NewUserDto;
+import ayd.proyecto1.fastdelivery.dto.request.ValidateCodeDto;
 import ayd.proyecto1.fastdelivery.dto.response.ResponseSuccessfullyDto;
 import ayd.proyecto1.fastdelivery.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,12 @@ public class UserController implements UserApi {
     public ResponseEntity<ResponseSuccessfullyDto> login(LoginDto loginDto) {
         log.info("POST user/login");
         ResponseSuccessfullyDto responseSuccessfullyDto = userService.login(loginDto);
+        return new ResponseEntity<>(responseSuccessfullyDto, responseSuccessfullyDto.getCode());
+    }
+
+    @Override
+    public ResponseEntity<ResponseSuccessfullyDto> validateToken(ValidateCodeDto validateCodeDto) {
+        ResponseSuccessfullyDto responseSuccessfullyDto = userService.validateCode(validateCodeDto);
         return new ResponseEntity<>(responseSuccessfullyDto, responseSuccessfullyDto.getCode());
     }
 
