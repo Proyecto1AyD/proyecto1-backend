@@ -4,24 +4,23 @@ spring:
   application:
     name: fastdelivery
   datasource:
-    url: 'jdbc:mariadb://localhost:3306/fastdelivery'
-    username: diego
-    password: diego18
-    mail:
-      issue: C�digo de Verificaci�n
-      message: Código para iniciar sesión
-      host: smtp.gmail.com
-      port: 587
-      username: deepgptsolutions@gmail.com
-      password: bypr fpxa vzpm ywpr
-      properties:
-        mail:
-          smtp:
-            auth: true
-            starttls:
-              enable: true
-      approval:
-        issue: Credenciales de Acceso
-        message: Tu cuenta ha sido aprobada. Estas son tus credenciales
+    url: 'jdbc:mysql://metro.proxy.rlwy.net:15941/fastdelivery?useSSL=true&allowPublicKeyRetrieval=true&serverTimezone=UTC'
+    username: root
+    password: qjwKPuQfrgABbChcQCozipfLeCgijzSF
   mail:
+    issue: C�digo de Verificaci�n
+    message: Código para iniciar sesión
+    host: smtp.gmail.com
+    port: 587
+    username: deepgptsolutions@gmail.com
+    password: bypr fpxa vzpm ywpr
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+    approval:
+      issue: Credenciales de Acceso
+      message: Tu cuenta ha sido aprobada. Estas son tus credenciales
     recovery_subject: C�digo de Recuperaci�n de Contrase�a.
