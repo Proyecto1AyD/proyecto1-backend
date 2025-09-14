@@ -35,6 +35,8 @@ public class UserService {
 
     private final ValidationCodeService validationCodeService;
 
+    private static final Integer ADMIN_ID = 1;
+
 
     public ResponseSuccessfullyDto createUser(NewUserDto newUserDto){
         User user = new User();
@@ -110,5 +112,20 @@ public class UserService {
 
     public ResponseSuccessfullyDto validateCode(ValidateCodeDto validateCodeDto){
         return validationCodeService.getValidationCodeByUser(validateCodeDto);
+    }
+
+
+    public void validateAuthorizationHeader(Integer userId){
+        Optional<User> optionalUser = userCrud.findById(userId);
+
+        if(optionalUser.isEmpty()){
+            throw new BusinessException(HttpStatus.NOT_FOUND, "Credenciales incorrectas");
+        }
+
+        User user = optionalUser.get();
+
+        if(!user.getRole().getId().equals(ADMIN_ID)){
+            throw new BusinessException(HttpStatus.UNAUTHORIZED,"El usuario no cuenta con permisos para realizar la acción");
+        }
     }
 }
