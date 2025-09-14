@@ -7,8 +7,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class UpdateUserDto {
-    private Integer userId;
+public class UpdateEntityDto {
+    private Integer id;
     private String fieldName;
     private String newValue;
 }

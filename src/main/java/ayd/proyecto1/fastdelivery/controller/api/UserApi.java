@@ -2,7 +2,7 @@ package ayd.proyecto1.fastdelivery.controller.api;
 
 import ayd.proyecto1.fastdelivery.dto.request.LoginDto;
 import ayd.proyecto1.fastdelivery.dto.request.NewUserDto;
-import ayd.proyecto1.fastdelivery.dto.request.UpdateUserDto;
+import ayd.proyecto1.fastdelivery.dto.request.UpdateEntityDto;
 import ayd.proyecto1.fastdelivery.dto.request.ValidateCodeDto;
 import ayd.proyecto1.fastdelivery.dto.response.ResponseSuccessfullyDto;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +27,7 @@ public interface UserApi {
     ResponseEntity<ResponseSuccessfullyDto> getAllBussines(@RequestHeader(value = "authorization") Integer authorization);
 
     @PutMapping
-    ResponseEntity<ResponseSuccessfullyDto> updateUser(@RequestBody UpdateUserDto updateUserDto, @RequestHeader(value = "authorization") Integer authorization);
+    ResponseEntity<ResponseSuccessfullyDto> updateUser(@RequestBody UpdateEntityDto updateUserDto, @RequestHeader(value = "authorization") Integer authorization);
 
     @DeleteMapping("/{idUser}")
     ResponseEntity<ResponseSuccessfullyDto> deleteUser(@PathVariable("idUser") Integer idUser, @RequestHeader(value = "authorization") Integer authorization);

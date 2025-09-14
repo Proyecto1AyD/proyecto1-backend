@@ -4,7 +4,7 @@ package ayd.proyecto1.fastdelivery.controller;
 import ayd.proyecto1.fastdelivery.controller.api.UserApi;
 import ayd.proyecto1.fastdelivery.dto.request.LoginDto;
 import ayd.proyecto1.fastdelivery.dto.request.NewUserDto;
-import ayd.proyecto1.fastdelivery.dto.request.UpdateUserDto;
+import ayd.proyecto1.fastdelivery.dto.request.UpdateEntityDto;
 import ayd.proyecto1.fastdelivery.dto.request.ValidateCodeDto;
 import ayd.proyecto1.fastdelivery.dto.response.ResponseSuccessfullyDto;
 import ayd.proyecto1.fastdelivery.service.UserService;
@@ -60,7 +60,7 @@ public class UserController implements UserApi {
         return ResponseEntity.ok(responseSuccessfullyDto);
     }
 
-    public ResponseEntity<ResponseSuccessfullyDto> updateUser(UpdateUserDto updateUserDto, Integer authorization) {
+    public ResponseEntity<ResponseSuccessfullyDto> updateUser(UpdateEntityDto updateUserDto, Integer authorization) {
         log.info("PUT user/");
         userService.validateAuthorizationHeader(authorization);
         ResponseSuccessfullyDto responseSuccessfullyDto = userService.updateUserField(updateUserDto);

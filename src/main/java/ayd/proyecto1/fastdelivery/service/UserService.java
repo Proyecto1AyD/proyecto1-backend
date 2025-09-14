@@ -2,15 +2,13 @@ package ayd.proyecto1.fastdelivery.service;
 
 import ayd.proyecto1.fastdelivery.dto.request.LoginDto;
 import ayd.proyecto1.fastdelivery.dto.request.NewUserDto;
-import ayd.proyecto1.fastdelivery.dto.request.UpdateUserDto;
+import ayd.proyecto1.fastdelivery.dto.request.UpdateEntityDto;
 import ayd.proyecto1.fastdelivery.dto.request.ValidateCodeDto;
 import ayd.proyecto1.fastdelivery.dto.response.BussinesInfoDto;
 import ayd.proyecto1.fastdelivery.dto.response.ResponseSuccessfullyDto;
-import ayd.proyecto1.fastdelivery.dto.response.RoleInfoDto;
 import ayd.proyecto1.fastdelivery.dto.response.UserInfoDto;
 import ayd.proyecto1.fastdelivery.exception.BusinessException;
 import ayd.proyecto1.fastdelivery.repository.crud.UserCrud;
-import ayd.proyecto1.fastdelivery.repository.crud.ValidationCodeCrud;
 import ayd.proyecto1.fastdelivery.repository.entities.Role;
 import ayd.proyecto1.fastdelivery.repository.entities.User;
 import ayd.proyecto1.fastdelivery.repository.entities.ValidationCode;
@@ -146,8 +144,8 @@ public class UserService {
         return ResponseSuccessfullyDto.builder().code(HttpStatus.OK).body(bussinesInfoDtoList).build();
     }
 
-    public ResponseSuccessfullyDto updateUserField(UpdateUserDto updateUserDto) {
-        Optional<User> optionalUser = userCrud.findById(updateUserDto.getUserId());
+    public ResponseSuccessfullyDto updateUserField(UpdateEntityDto updateUserDto) {
+        Optional<User> optionalUser = userCrud.findById(updateUserDto.getId());
         if (optionalUser.isEmpty()) {
             throw new BusinessException(HttpStatus.NOT_FOUND, "Usuario no encontrado.");
         }

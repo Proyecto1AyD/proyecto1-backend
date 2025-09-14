@@ -17,18 +17,23 @@ public class Card {
 
     private String title;
 
+    @Column(name = "shippingPrice")
     private Double shippingPrice;
 
     private Integer discount;
 
+    @Column(name = "cancellationPayment")
     private Integer cancellationPayment;
 
+    @Column(name = "freeCancellations")
     private Integer freeCancellations;
 
+    @Column(name = "minPackages")
     private Integer minPackages;
 
+    @Column(name = "maxPackages")
     private Integer maxPackages;
-
+/*
     @OneToMany(fetch = FetchType.LAZY)
-    private List<BusinessCard> businessCards;
+    private List<BusinessCard> businessCards;*/
 }
