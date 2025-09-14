@@ -24,14 +24,14 @@ public interface UserApi {
     ResponseEntity<ResponseSuccessfullyDto> validateToken(@RequestBody ValidateCodeDto validateCodeDto);
 
     @GetMapping("/allBussines")
-    ResponseEntity<ResponseSuccessfullyDto> getAllBussines();
+    ResponseEntity<ResponseSuccessfullyDto> getAllBussines(@RequestHeader(value = "authorization") Integer authorization);
 
     @PutMapping
-    ResponseEntity<ResponseSuccessfullyDto> updateUser(@RequestBody UpdateUserDto updateUserDto);
+    ResponseEntity<ResponseSuccessfullyDto> updateUser(@RequestBody UpdateUserDto updateUserDto, @RequestHeader(value = "authorization") Integer authorization);
 
     @DeleteMapping("/{idUser}")
-    ResponseEntity<ResponseSuccessfullyDto> deleteUser(@PathVariable("idUser") Integer idUser);
-
+    ResponseEntity<ResponseSuccessfullyDto> deleteUser(@PathVariable("idUser") Integer idUser, @RequestHeader(value = "authorization") Integer authorization);
+//EJEMPLO
     @PostMapping("/test/{nombre}")
     ResponseEntity<ResponseSuccessfullyDto> prueba(@RequestBody LoginDto loginDto, @RequestHeader(value = "token") String token,@RequestParam("id") String id,
                 @PathVariable("nombre") String nombre);
