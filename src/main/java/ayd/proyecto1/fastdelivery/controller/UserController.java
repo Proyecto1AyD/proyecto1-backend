@@ -53,20 +53,23 @@ public class UserController implements UserApi {
         return new ResponseEntity<>(responseSuccessfullyDto,responseSuccessfullyDto.getCode());
     }
 
-    public ResponseEntity<ResponseSuccessfullyDto> getAllBussines() {
+    public ResponseEntity<ResponseSuccessfullyDto> getAllBussines(Integer authorization) {
         log.info("GET user/allBussines");
+        userService.validateAuthorizationHeader(authorization);
         ResponseSuccessfullyDto responseSuccessfullyDto = userService.getAllBussines();
         return ResponseEntity.ok(responseSuccessfullyDto);
     }
 
-    public ResponseEntity<ResponseSuccessfullyDto> updateUser(UpdateUserDto updateUserDto) {
+    public ResponseEntity<ResponseSuccessfullyDto> updateUser(UpdateUserDto updateUserDto, Integer authorization) {
         log.info("PUT user/");
+        userService.validateAuthorizationHeader(authorization);
         ResponseSuccessfullyDto responseSuccessfullyDto = userService.updateUserField(updateUserDto);
         return ResponseEntity.ok(responseSuccessfullyDto);
     }
 
-    public ResponseEntity<ResponseSuccessfullyDto> deleteUser(Integer idUser) {
+    public ResponseEntity<ResponseSuccessfullyDto> deleteUser(Integer idUser, Integer authorization) {
         log.info("DELETE user/");
+        userService.validateAuthorizationHeader(authorization);
         ResponseSuccessfullyDto responseSuccessfullyDto = userService.deleteUser(idUser);
         return ResponseEntity.ok(responseSuccessfullyDto);
     }
