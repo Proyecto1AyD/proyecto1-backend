@@ -10,6 +10,7 @@ import ayd.proyecto1.fastdelivery.dto.response.RoleInfoDto;
 import ayd.proyecto1.fastdelivery.dto.response.UserInfoDto;
 import ayd.proyecto1.fastdelivery.exception.BusinessException;
 import ayd.proyecto1.fastdelivery.repository.crud.UserCrud;
+import ayd.proyecto1.fastdelivery.repository.crud.ValidationCodeCrud;
 import ayd.proyecto1.fastdelivery.repository.entities.Role;
 import ayd.proyecto1.fastdelivery.repository.entities.User;
 import ayd.proyecto1.fastdelivery.repository.entities.ValidationCode;
@@ -37,6 +38,8 @@ public class UserService {
     private final RoleService roleService;
 
     private final ValidationCodeService validationCodeService;
+
+    private static final Integer ADMIN_ID = 1;
 
 
     public ResponseSuccessfullyDto createUser(NewUserDto newUserDto){
@@ -113,6 +116,21 @@ public class UserService {
 
     public ResponseSuccessfullyDto validateCode(ValidateCodeDto validateCodeDto){
         return validationCodeService.getValidationCodeByUser(validateCodeDto);
+    }
+
+
+    public void validateAuthorizationHeader(Integer userId){
+        Optional<User> optionalUser = userCrud.findById(userId);
+
+        if(optionalUser.isEmpty()){
+            throw new BusinessException(HttpStatus.NOT_FOUND, "Credenciales incorrectas");
+        }
+
+        User user = optionalUser.get();
+
+        if(!user.getRole().getId().equals(ADMIN_ID)){
+            throw new BusinessException(HttpStatus.UNAUTHORIZED,"El usuario no cuenta con permisos para realizar la acción");
+        }
     }
 
     public ResponseSuccessfullyDto getAllBussines(){
