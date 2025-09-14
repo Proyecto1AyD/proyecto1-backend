@@ -4,10 +4,13 @@ import ayd.proyecto1.fastdelivery.dto.request.LoginDto;
 import ayd.proyecto1.fastdelivery.dto.request.NewUserDto;
 import ayd.proyecto1.fastdelivery.dto.request.ValidateCodeDto;
 import ayd.proyecto1.fastdelivery.dto.response.ResponseSuccessfullyDto;
+import ayd.proyecto1.fastdelivery.dto.response.UserInfoDto;
 import ayd.proyecto1.fastdelivery.exception.BusinessException;
 import ayd.proyecto1.fastdelivery.repository.crud.UserCrud;
+import ayd.proyecto1.fastdelivery.repository.crud.ValidationCodeCrud;
 import ayd.proyecto1.fastdelivery.repository.entities.Role;
 import ayd.proyecto1.fastdelivery.repository.entities.User;
+import ayd.proyecto1.fastdelivery.repository.entities.ValidationCode;
 import ayd.proyecto1.fastdelivery.utils.GeneralUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +33,7 @@ public class UserService {
 
     private final RoleService roleService;
 
+    private final ValidationCodeService validationCodeService;
 
 
     public ResponseSuccessfullyDto createUser(NewUserDto newUserDto){
@@ -72,20 +76,39 @@ public class UserService {
             throw new BusinessException(HttpStatus.NOT_FOUND,"Crendenciales incorrectas");
         }
 
-        emailService.sendEmail(user.getEmail(),"Código de Verificación","El codigo es 321");
+        if(user.getAuthentication()){
+            log.info("Send code to user...");
+            sendCodeToUser(user);
 
-        return ResponseSuccessfullyDto.builder()
-                .code(HttpStatus.OK)
-                .message("Se ha enviado un código de verificación a su correo electrónico!")
+            return ResponseSuccessfullyDto.builder()
+                    .code(HttpStatus.OK)
+                    .message("Se ha enviado un código de verificación a su correo electrónico!")
+                    .build();
+        }
+
+        UserInfoDto userInfoDto = UserInfoDto.builder()
+                .userId(user.getId())
+                .username(user.getUsername())
+                .role(user.getRole().getRole())
+                .autentication(user.getAuthentication())
                 .build();
+
+        return ResponseSuccessfullyDto.builder().code(HttpStatus.ACCEPTED).message("Inicio de sesión exitoso").body(userInfoDto).build();
+    }
+
+
+    public void sendCodeToUser(User user){
+        String code = utils.generateVerificationCode();
+        emailService.sendEmail(user.getEmail(),"Código de Verificación","El codigo es: "+code);
+
+        ValidationCode validationCode = new ValidationCode();
+        validationCode.setUser(user);
+        validationCode.setCode(code);
+        validationCode.setExpirationTime(utils.createExpirationDate(2));
+        validationCodeService.createValidationCode(validationCode);
     }
 
     public ResponseSuccessfullyDto validateCode(ValidateCodeDto validateCodeDto){
-
-        if(!validateCodeDto.getCode().equals("1234")){
-            throw new BusinessException(HttpStatus.UNAUTHORIZED,"The code is invalid.");
-        }
-
-        return ResponseSuccessfullyDto.builder().code(HttpStatus.ACCEPTED).message("the code is valid").build();
+        return validationCodeService.getValidationCodeByUser(validateCodeDto);
     }
 }

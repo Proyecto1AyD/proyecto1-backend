@@ -12,4 +12,6 @@ public class ValidateCodeDto {
 
     private String code;
 
+    private Integer userId;
+
 }

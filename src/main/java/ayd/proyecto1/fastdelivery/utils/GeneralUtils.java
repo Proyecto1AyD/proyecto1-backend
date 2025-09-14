@@ -4,6 +4,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import java.security.SecureRandom;
+import java.util.Calendar;
+import java.util.Date;
 
 @Service
 public class GeneralUtils {
@@ -29,6 +31,14 @@ public class GeneralUtils {
             sb.append(CHARACTERS.charAt(index));
         }
         return sb.toString();
+    }
+
+    public Date createExpirationDate(Integer minutes) {
+        Date actualDate = new Date();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(actualDate);
+        calendar.add(Calendar.MINUTE, minutes);
+        return calendar.getTime();
     }
 
 }
