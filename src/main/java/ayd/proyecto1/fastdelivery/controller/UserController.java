@@ -4,6 +4,7 @@ package ayd.proyecto1.fastdelivery.controller;
 import ayd.proyecto1.fastdelivery.controller.api.UserApi;
 import ayd.proyecto1.fastdelivery.dto.request.LoginDto;
 import ayd.proyecto1.fastdelivery.dto.request.NewUserDto;
+import ayd.proyecto1.fastdelivery.dto.request.UpdateUserDto;
 import ayd.proyecto1.fastdelivery.dto.request.ValidateCodeDto;
 import ayd.proyecto1.fastdelivery.dto.response.ResponseSuccessfullyDto;
 import ayd.proyecto1.fastdelivery.service.UserService;
@@ -52,5 +53,22 @@ public class UserController implements UserApi {
         return new ResponseEntity<>(responseSuccessfullyDto,responseSuccessfullyDto.getCode());
     }
 
+    public ResponseEntity<ResponseSuccessfullyDto> getAllBussines() {
+        log.info("GET user/allBussines");
+        ResponseSuccessfullyDto responseSuccessfullyDto = userService.getAllBussines();
+        return ResponseEntity.ok(responseSuccessfullyDto);
+    }
+
+    public ResponseEntity<ResponseSuccessfullyDto> updateUser(UpdateUserDto updateUserDto) {
+        log.info("PUT user/");
+        ResponseSuccessfullyDto responseSuccessfullyDto = userService.updateUserField(updateUserDto);
+        return ResponseEntity.ok(responseSuccessfullyDto);
+    }
+
+    public ResponseEntity<ResponseSuccessfullyDto> deleteUser(Integer idUser) {
+        log.info("DELETE user/");
+        ResponseSuccessfullyDto responseSuccessfullyDto = userService.deleteUser(idUser);
+        return ResponseEntity.ok(responseSuccessfullyDto);
+    }
 
 }
