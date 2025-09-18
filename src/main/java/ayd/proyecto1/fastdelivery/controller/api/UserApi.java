@@ -5,6 +5,7 @@ import ayd.proyecto1.fastdelivery.dto.request.NewUserDto;
 import ayd.proyecto1.fastdelivery.dto.request.UpdateEntityDto;
 import ayd.proyecto1.fastdelivery.dto.request.ValidateCodeDto;
 import ayd.proyecto1.fastdelivery.dto.response.ResponseSuccessfullyDto;
+import ayd.proyecto1.fastdelivery.dto.response.UserDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,7 +28,7 @@ public interface UserApi {
     ResponseEntity<ResponseSuccessfullyDto> getAllBussines(@RequestHeader(value = "authorization") Integer authorization);
 
     @PutMapping
-    ResponseEntity<ResponseSuccessfullyDto> updateUser(@RequestBody UpdateEntityDto updateUserDto, @RequestHeader(value = "authorization") Integer authorization);
+    ResponseEntity<ResponseSuccessfullyDto> updateUser(@RequestBody UserDto updateUserDto, @RequestHeader(value = "authorization") Integer authorization);
 
     @DeleteMapping("/{idUser}")
     ResponseEntity<ResponseSuccessfullyDto> deleteUser(@PathVariable("idUser") Integer idUser, @RequestHeader(value = "authorization") Integer authorization);

@@ -4,9 +4,7 @@ import ayd.proyecto1.fastdelivery.dto.request.LoginDto;
 import ayd.proyecto1.fastdelivery.dto.request.NewUserDto;
 import ayd.proyecto1.fastdelivery.dto.request.UpdateEntityDto;
 import ayd.proyecto1.fastdelivery.dto.request.ValidateCodeDto;
-import ayd.proyecto1.fastdelivery.dto.response.BussinesInfoDto;
-import ayd.proyecto1.fastdelivery.dto.response.ResponseSuccessfullyDto;
-import ayd.proyecto1.fastdelivery.dto.response.UserInfoDto;
+import ayd.proyecto1.fastdelivery.dto.response.*;
 import ayd.proyecto1.fastdelivery.exception.BusinessException;
 import ayd.proyecto1.fastdelivery.repository.crud.UserCrud;
 import ayd.proyecto1.fastdelivery.repository.entities.Role;
@@ -144,43 +142,31 @@ public class UserService {
         return ResponseSuccessfullyDto.builder().code(HttpStatus.OK).body(bussinesInfoDtoList).build();
     }
 
-    public ResponseSuccessfullyDto updateUserField(UpdateEntityDto updateUserDto) {
-        Optional<User> optionalUser = userCrud.findById(updateUserDto.getId());
-        if (optionalUser.isEmpty()) {
-            throw new BusinessException(HttpStatus.NOT_FOUND, "Usuario no encontrado.");
+    public ResponseSuccessfullyDto updateUser(UserDto userDto){
+
+        Optional<User> optionalUser = userCrud.findById(userDto.getUserId());
+
+        if(optionalUser.isEmpty()){
+            throw new BusinessException(HttpStatus.NOT_FOUND,"El usuario no ha sido encontrado");
         }
         User user = optionalUser.get();
+        user.setName(userDto.getNombre());
+        user.setEmail(userDto.getEmail());
+        user.setAddress(userDto.getDireccion());
+        user.setPhone(userDto.getTelefono());
+        user.setUsername(userDto.getUsername());
+        user.setPassword(utils.hashPassword(userDto.getPassword()));
+        user.setPhone(userDto.getTelefono());
+        user.setAddress(userDto.getDireccion());
+        Role role = roleService.getRoleById(userDto.getRol());
+        user.setRole(role);
 
-        switch (updateUserDto.getFieldName().toLowerCase()) {
-            case "name":
-                user.setName(updateUserDto.getNewValue());
-                break;
-            case "email":
-                user.setEmail(updateUserDto.getNewValue());
-                break;
-            case "phone":
-                user.setPhone(updateUserDto.getNewValue());
-                break;
-            case "address":
-                user.setAddress(updateUserDto.getNewValue());
-                break;
-            case "username":
-                user.setUsername(updateUserDto.getNewValue());
-                break;
-            default:
-                throw new BusinessException(HttpStatus.BAD_REQUEST, "Campo no válido para actualización.");
-        }
-
-        try {
+        try{
             userCrud.save(user);
-            log.info("Campo " + updateUserDto.getFieldName() + " del usuario fue actualizado correctamente.");
-
-            return ResponseSuccessfullyDto.builder()
-                    .code(HttpStatus.OK)
-                    .message("El campo " + updateUserDto.getFieldName() + " fue actualizado correctamente")
-                    .build();
-        } catch (Exception e) {
-            throw new BusinessException(HttpStatus.BAD_REQUEST, "Error al intentar actualizar el campo del usuario.");
+            log.info("Usuario actualizado...");
+            return ResponseSuccessfullyDto.builder().code(HttpStatus.OK).message("Usuario actualizado exitosamente").build();
+        }catch (Exception exception){
+            throw new BusinessException(HttpStatus.BAD_REQUEST,"Error al actualizar un Usuario");
         }
     }
 

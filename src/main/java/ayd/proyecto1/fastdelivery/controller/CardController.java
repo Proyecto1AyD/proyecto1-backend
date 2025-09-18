@@ -6,6 +6,7 @@ import ayd.proyecto1.fastdelivery.dto.request.NewBranchDto;
 import ayd.proyecto1.fastdelivery.dto.request.NewCardDto;
 import ayd.proyecto1.fastdelivery.dto.request.UpdateEntityDto;
 import ayd.proyecto1.fastdelivery.dto.response.BranchDto;
+import ayd.proyecto1.fastdelivery.dto.response.CardDto;
 import ayd.proyecto1.fastdelivery.dto.response.ResponseSuccessfullyDto;
 import ayd.proyecto1.fastdelivery.service.CardService;
 import ayd.proyecto1.fastdelivery.service.UserService;
@@ -49,7 +50,7 @@ public class CardController implements CardApi {
     }
 
     @Override
-    public ResponseEntity<ResponseSuccessfullyDto> updateCard(UpdateEntityDto cardDto, Integer userId) {
+    public ResponseEntity<ResponseSuccessfullyDto> updateCard(CardDto cardDto, Integer userId) {
         log.info("PUT /card");
         userService.validateAuthorizationHeader(userId);
         ResponseSuccessfullyDto responseSuccessfullyDto = cardService.updateCard(cardDto);
