@@ -16,12 +16,15 @@ public class DeliveryPerson {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(precision = 8, scale = 2) 
-    private BigDecimal wallet;
+    private Double wallet;
 
-    private Integer id_contract;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_contract", referencedColumnName = "id")
+    private Contract contract;
 
-    private Integer id_branch;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_branch", referencedColumnName = "id")
+    private Branch branch;
 
     private Boolean available;
 

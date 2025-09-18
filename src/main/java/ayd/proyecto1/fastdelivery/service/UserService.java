@@ -198,4 +198,14 @@ public class UserService {
                 .build();
     }
 
+    public User getById(Integer id){
+        Optional<User> optionalUser = userCrud.findById(id);
+
+        if(optionalUser.isEmpty()){
+            throw new BusinessException(HttpStatus.NOT_FOUND, "El usuario no ha sido encontrado");
+        }
+
+        return optionalUser.get();
+    }
+
 }
