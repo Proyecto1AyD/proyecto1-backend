@@ -7,6 +7,7 @@ import ayd.proyecto1.fastdelivery.dto.request.NewUserDto;
 import ayd.proyecto1.fastdelivery.dto.request.UpdateEntityDto;
 import ayd.proyecto1.fastdelivery.dto.request.ValidateCodeDto;
 import ayd.proyecto1.fastdelivery.dto.response.ResponseSuccessfullyDto;
+import ayd.proyecto1.fastdelivery.dto.response.UserDto;
 import ayd.proyecto1.fastdelivery.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -60,10 +61,10 @@ public class UserController implements UserApi {
         return ResponseEntity.ok(responseSuccessfullyDto);
     }
 
-    public ResponseEntity<ResponseSuccessfullyDto> updateUser(UpdateEntityDto updateUserDto, Integer authorization) {
+    public ResponseEntity<ResponseSuccessfullyDto> updateUser(UserDto updateUserDto, Integer authorization) {
         log.info("PUT user/");
         userService.validateAuthorizationHeader(authorization);
-        ResponseSuccessfullyDto responseSuccessfullyDto = userService.updateUserField(updateUserDto);
+        ResponseSuccessfullyDto responseSuccessfullyDto = userService.updateUser(updateUserDto);
         return ResponseEntity.ok(responseSuccessfullyDto);
     }
 

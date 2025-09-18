@@ -1,12 +1,13 @@
 package ayd.proyecto1.fastdelivery.service;
 
 import ayd.proyecto1.fastdelivery.dto.request.NewCardDto;
-import ayd.proyecto1.fastdelivery.dto.request.UpdateEntityDto;
 import ayd.proyecto1.fastdelivery.dto.response.CardDto;
 import ayd.proyecto1.fastdelivery.dto.response.ResponseSuccessfullyDto;
 import ayd.proyecto1.fastdelivery.exception.BusinessException;
 import ayd.proyecto1.fastdelivery.repository.crud.CardCrud;
 import ayd.proyecto1.fastdelivery.repository.entities.Card;
+import ayd.proyecto1.fastdelivery.repository.entities.Role;
+import ayd.proyecto1.fastdelivery.repository.entities.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -65,51 +66,28 @@ public class CardService {
         return ResponseSuccessfullyDto.builder().code(HttpStatus.OK).body(cardDtoList).build();
     }
 
-    public ResponseSuccessfullyDto updateCard(UpdateEntityDto cardDto){
+    public ResponseSuccessfullyDto updateCard(CardDto cardDto){
 
         Optional<Card> optionalCard = cardCrud.findById(cardDto.getId());
-        if (optionalCard.isEmpty()) {
-            throw new BusinessException(HttpStatus.NOT_FOUND, "Tarjeta no encontrada.");
+
+        if(optionalCard.isEmpty()){
+            throw new BusinessException(HttpStatus.NOT_FOUND,"El usuario no ha sido encontrado");
         }
         Card card = optionalCard.get();
+        card.setTitle(card.getTitle());
+        card.setShippingPrice(card.getShippingPrice());
+        card.setDiscount(card.getDiscount());
+        card.setCancellationPayment(card.getCancellationPayment());
+        card.setFreeCancellations(card.getFreeCancellations());
+        card.setMinPackages(card.getMinPackages());
+        card.setMaxPackages(card.getMaxPackages());
 
-        switch (cardDto.getFieldName()) {
-            case "title":
-                card.setTitle(cardDto.getNewValue());
-                break;
-            case "shippingPrice":
-                Double hola = Double.valueOf(cardDto.getNewValue());
-                card.setShippingPrice(Double.valueOf(cardDto.getNewValue()));
-                break;
-            case "discount":
-                card.setDiscount(Integer.valueOf(cardDto.getNewValue()));
-                break;
-            case "cancellationPayment":
-                card.setCancellationPayment(Integer.valueOf(cardDto.getNewValue()));
-                break;
-            case "freeCancellations":
-                card.setFreeCancellations(Integer.valueOf(cardDto.getNewValue()));
-                break;
-            case "minPackages":
-                card.setMinPackages(Integer.valueOf(cardDto.getNewValue()));
-                break;
-            case "maxPackages":
-                card.setMaxPackages(Integer.valueOf(cardDto.getNewValue()));
-                break;
-            default:
-                throw new BusinessException(HttpStatus.BAD_REQUEST, "Campo no válido para actualización o dato no ingresado correctamente");
-        }
-
-        try {
+        try{
             cardCrud.save(card);
-            log.info("Campo " + cardDto.getFieldName() + " de la tarjeta fue actualizado correctamente.");
-
-            return ResponseSuccessfullyDto.builder()
-                    .code(HttpStatus.OK)
-                    .message("El campo " + cardDto.getFieldName() + " fue actualizado correctamente")
-                    .build();
-        } catch (Exception e) {
-            throw new BusinessException(HttpStatus.BAD_REQUEST, "Error al intentar actualizar el campo de la tarjeta.");
+            log.info("Tarjeta actualizada...");
+            return ResponseSuccessfullyDto.builder().code(HttpStatus.OK).message("Tarjeta actualizada exitosamente").build();
+        }catch (Exception exception){
+            throw new BusinessException(HttpStatus.BAD_REQUEST,"Error al actualizar una Tarjeta.");
         }
     }
 
