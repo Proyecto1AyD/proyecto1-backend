@@ -194,4 +194,20 @@ public class UserService {
         return optionalUser.get();
     }
 
+
+
+    public ResponseSuccessfullyDto updateAuthenticationStatus(Integer userId, Boolean status){
+
+        User user = getById(userId);
+        user.setAuthentication(status);
+        try{
+            userCrud.save(user);
+            return ResponseSuccessfullyDto.builder()
+                    .code(HttpStatus.OK)
+                    .message(status ? "Autenticacion en 2 pasos fué activado" : "Autenticacion en 2 pasos ha sido desactivado").build();
+        }catch (Exception exception){
+            throw new BusinessException(HttpStatus.BAD_REQUEST,"Error al actualizar los permisos de autenticación en 2 pasos.");
+        }
+    }
+
 }

@@ -2,10 +2,7 @@ package ayd.proyecto1.fastdelivery.controller;
 
 
 import ayd.proyecto1.fastdelivery.controller.api.UserApi;
-import ayd.proyecto1.fastdelivery.dto.request.LoginDto;
-import ayd.proyecto1.fastdelivery.dto.request.NewUserDto;
-import ayd.proyecto1.fastdelivery.dto.request.UpdateEntityDto;
-import ayd.proyecto1.fastdelivery.dto.request.ValidateCodeDto;
+import ayd.proyecto1.fastdelivery.dto.request.*;
 import ayd.proyecto1.fastdelivery.dto.response.ResponseSuccessfullyDto;
 import ayd.proyecto1.fastdelivery.dto.response.UserDto;
 import ayd.proyecto1.fastdelivery.service.UserService;
@@ -73,6 +70,13 @@ public class UserController implements UserApi {
         userService.validateAuthorizationHeader(authorization);
         ResponseSuccessfullyDto responseSuccessfullyDto = userService.deleteUser(idUser);
         return ResponseEntity.ok(responseSuccessfullyDto);
+    }
+
+    @Override
+    public ResponseEntity<ResponseSuccessfullyDto> updateAuthStatus(UpdateAuthStatusDto updateAuthStatusDto, Integer userId) {
+        log.info("PUT user/authentication/status");
+        ResponseSuccessfullyDto responseSuccessfullyDto = userService.updateAuthenticationStatus(userId,updateAuthStatusDto.getStatus());
+        return null;
     }
 
 }
