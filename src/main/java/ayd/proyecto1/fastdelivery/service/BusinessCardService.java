@@ -38,7 +38,7 @@ public class BusinessCardService {
 
         BusinessCard businessCard = new BusinessCard();
 
-        User user = userService.getUserByID(newBussinesCardDto.getIdBussines());
+        User user = userService.getById(newBussinesCardDto.getIdBussines());
         if(!user.getRole().getId().equals(BUSINESS_ID)){
             throw new BusinessException(HttpStatus.UNAUTHORIZED,"El usuario no corresponde a un Comercio Afiliado");
         }
@@ -110,7 +110,7 @@ public class BusinessCardService {
             throw new BusinessException(HttpStatus.NOT_FOUND,"El Comercio-Tarjeta no ha sido encontrada");
         }
         BusinessCard businessCard = optionalBusinessCard.get();
-        businessCard.setBusiness(userService.getUserByID(bussinesCardDto.getIdBussines()));
+        businessCard.setBusiness(userService.getById(bussinesCardDto.getIdBussines()));
         businessCard.setCard(cardService.getCardByIdCard(bussinesCardDto.getIdCard()));
         businessCard.setLoyaltyActive(bussinesCardDto.getLoyaltyActive());
         businessCard.setCancellations(bussinesCardDto.getCancellations());
