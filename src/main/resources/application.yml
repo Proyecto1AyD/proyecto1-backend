@@ -4,9 +4,9 @@ spring:
   application:
     name: fastdelivery
   datasource:
-    url: 'jdbc:mysql://metro.proxy.rlwy.net:15941/fastdelivery?useSSL=true&allowPublicKeyRetrieval=true&serverTimezone=UTC'
+    url: 'jdbc:mysql://yamanote.proxy.rlwy.net:25829/fastdelivery?useSSL=true&allowPublicKeyRetrieval=true&serverTimezone=UTC'
     username: root
-    password: qjwKPuQfrgABbChcQCozipfLeCgijzSF
+    password: mYOTIsKlXBgwBRozYZvHOONqBXBzvhCf
   mail:
     issue: C�digo de Verificaci�n
     message: Código para iniciar sesión

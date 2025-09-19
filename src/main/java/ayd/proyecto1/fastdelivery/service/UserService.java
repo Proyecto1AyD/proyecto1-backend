@@ -37,7 +37,6 @@ public class UserService {
 
     private static final Integer ADMIN_ID = 1;
 
-
     public ResponseSuccessfullyDto createUser(NewUserDto newUserDto){
         User user = new User();
         user.setName(newUserDto.getNombre());
@@ -140,6 +139,25 @@ public class UserService {
         });
 
         return ResponseSuccessfullyDto.builder().code(HttpStatus.OK).body(bussinesInfoDtoList).build();
+    }
+
+    public ResponseSuccessfullyDto getAllUsers(){
+
+        List<User> users = userCrud.findAll();
+        List<UserDto> userDtos = new ArrayList<>();
+        Role role = roleService.getRoleById(4);
+        users.forEach(user -> {
+            UserDto userDto = UserDto.builder().userId(user.getId()).nombre(user.getName()).username(user.getUsername()).rol(user.getRole().getId()).email(user.getEmail()).telefono(user.getPhone()).direccion(user.getAddress()).build();
+            userDtos.add(userDto);
+        });
+
+        return ResponseSuccessfullyDto.builder().code(HttpStatus.OK).body(userDtos).build();
+    }
+
+    public ResponseSuccessfullyDto getUserById(Integer id){
+        User userTemp = getById(id);
+        UserDto userDto = UserDto.builder().userId(userTemp.getId()).nombre(userTemp.getName()).username(userTemp.getUsername()).rol(userTemp.getRole().getId()).email(userTemp.getEmail()).telefono(userTemp.getPhone()).direccion(userTemp.getAddress()).build();
+        return ResponseSuccessfullyDto.builder().code(HttpStatus.OK).body(userDto).build();
     }
 
     public ResponseSuccessfullyDto updateUser(UserDto userDto){
