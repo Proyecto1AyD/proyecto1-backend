@@ -16,10 +16,5 @@ public class NewBussinesCardDto {
 
     private Integer idCard;
 
-    private Boolean fidelizacionActiva = true;
-
-    private Integer cancelaciones = 0;
-
-    private Date affiliationDate = new Date();
 }
 

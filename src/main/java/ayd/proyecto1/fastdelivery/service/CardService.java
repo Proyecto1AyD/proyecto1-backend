@@ -6,8 +6,6 @@ import ayd.proyecto1.fastdelivery.dto.response.ResponseSuccessfullyDto;
 import ayd.proyecto1.fastdelivery.exception.BusinessException;
 import ayd.proyecto1.fastdelivery.repository.crud.CardCrud;
 import ayd.proyecto1.fastdelivery.repository.entities.Card;
-import ayd.proyecto1.fastdelivery.repository.entities.Role;
-import ayd.proyecto1.fastdelivery.repository.entities.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -107,5 +105,26 @@ public class CardService {
         }catch (Exception exception){
             throw new BusinessException(HttpStatus.BAD_REQUEST,"Error al eliminar la tarjeta");
         }
+    }
+
+    public Card getCardByIdCard(Integer id){
+
+        Optional<Card> optionalCard = cardCrud.findById(id);
+
+        if(optionalCard.isEmpty()){
+            throw new BusinessException(HttpStatus.NOT_FOUND,"Card not exists");
+        }
+
+        return optionalCard.get();
+    }
+
+    public List<Card> getAllCardList(){
+        List<Card> cardList = cardCrud.findAll();
+
+        if(cardList.isEmpty()){
+            throw new BusinessException(HttpStatus.NOT_FOUND,"Card's not exists");
+        }
+
+        return cardList;
     }
 }

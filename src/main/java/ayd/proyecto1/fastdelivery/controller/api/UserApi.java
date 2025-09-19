@@ -27,6 +27,12 @@ public interface UserApi {
     @GetMapping("/allBussines")
     ResponseEntity<ResponseSuccessfullyDto> getAllBussines(@RequestHeader(value = "authorization") Integer authorization);
 
+    @GetMapping("/all")
+    ResponseEntity<ResponseSuccessfullyDto> getAll(@RequestHeader(value = "authorization") Integer authorization);
+
+    @GetMapping("/{id}")
+    ResponseEntity<ResponseSuccessfullyDto> getUserById(@PathVariable Integer id, @RequestHeader(value = "authorization") Integer userId);
+
     @PutMapping
     ResponseEntity<ResponseSuccessfullyDto> updateUser(@RequestBody UserDto updateUserDto, @RequestHeader(value = "authorization") Integer authorization);
 

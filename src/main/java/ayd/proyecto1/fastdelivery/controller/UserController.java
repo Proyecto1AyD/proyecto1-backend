@@ -61,6 +61,22 @@ public class UserController implements UserApi {
         return ResponseEntity.ok(responseSuccessfullyDto);
     }
 
+    @Override
+    public ResponseEntity<ResponseSuccessfullyDto> getAll(Integer authorization) {
+        log.info("GET user/all");
+        userService.validateAuthorizationHeader(authorization);
+        ResponseSuccessfullyDto responseSuccessfullyDto = userService.getAllUsers();
+        return ResponseEntity.ok(responseSuccessfullyDto);
+    }
+
+    @Override
+    public ResponseEntity<ResponseSuccessfullyDto> getUserById(Integer id, Integer userId) {
+        log.info("GET /user/{id}");
+        userService.validateAuthorizationHeader(userId);
+        ResponseSuccessfullyDto responseSuccessfullyDto = userService.getUserById(id);
+        return new ResponseEntity<>(responseSuccessfullyDto,responseSuccessfullyDto.getCode());
+    }
+
     public ResponseEntity<ResponseSuccessfullyDto> updateUser(UserDto updateUserDto, Integer authorization) {
         log.info("PUT user/");
         userService.validateAuthorizationHeader(authorization);

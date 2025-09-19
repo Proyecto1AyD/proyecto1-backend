@@ -19,7 +19,7 @@ public class BusinessCard {
 
     private Boolean loyaltyActive;
 
-    private Boolean cancellations;
+    private Integer cancellations;
 
     private Boolean active;
 
