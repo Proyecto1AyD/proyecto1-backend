@@ -1,9 +1,6 @@
 package ayd.proyecto1.fastdelivery.controller.api;
 
-import ayd.proyecto1.fastdelivery.dto.request.LoginDto;
-import ayd.proyecto1.fastdelivery.dto.request.NewUserDto;
-import ayd.proyecto1.fastdelivery.dto.request.UpdateEntityDto;
-import ayd.proyecto1.fastdelivery.dto.request.ValidateCodeDto;
+import ayd.proyecto1.fastdelivery.dto.request.*;
 import ayd.proyecto1.fastdelivery.dto.response.ResponseSuccessfullyDto;
 import ayd.proyecto1.fastdelivery.dto.response.UserDto;
 import org.springframework.http.ResponseEntity;
@@ -38,7 +35,12 @@ public interface UserApi {
 
     @DeleteMapping("/{idUser}")
     ResponseEntity<ResponseSuccessfullyDto> deleteUser(@PathVariable("idUser") Integer idUser, @RequestHeader(value = "authorization") Integer authorization);
-//EJEMPLO
+
+    @PutMapping("/authentication/status")
+    ResponseEntity<ResponseSuccessfullyDto> updateAuthStatus(@RequestBody UpdateAuthStatusDto updateAuthStatusDto, @RequestHeader(value = "user") Integer userId);
+
+
+    //EJEMPLO
     @PostMapping("/test/{nombre}")
     ResponseEntity<ResponseSuccessfullyDto> prueba(@RequestBody LoginDto loginDto, @RequestHeader(value = "token") String token,@RequestParam("id") String id,
                 @PathVariable("nombre") String nombre);

@@ -2,6 +2,7 @@ package ayd.proyecto1.fastdelivery.service;
 
 import ayd.proyecto1.fastdelivery.dto.request.LoginDto;
 import ayd.proyecto1.fastdelivery.dto.request.NewUserDto;
+import ayd.proyecto1.fastdelivery.dto.request.UpdateEntityDto;
 import ayd.proyecto1.fastdelivery.dto.request.ValidateCodeDto;
 import ayd.proyecto1.fastdelivery.dto.response.*;
 import ayd.proyecto1.fastdelivery.exception.BusinessException;
@@ -154,7 +155,7 @@ public class UserService {
     }
 
     public ResponseSuccessfullyDto getUserById(Integer id){
-        User userTemp = getUserByID(id);
+        User userTemp = getById(id);
         UserDto userDto = UserDto.builder().userId(userTemp.getId()).nombre(userTemp.getName()).username(userTemp.getUsername()).rol(userTemp.getRole().getId()).email(userTemp.getEmail()).telefono(userTemp.getPhone()).direccion(userTemp.getAddress()).build();
         return ResponseSuccessfullyDto.builder().code(HttpStatus.OK).body(userDto).build();
     }
@@ -201,15 +202,30 @@ public class UserService {
                 .build();
     }
 
-    public User getUserByID(Integer id){
-
+    public User getById(Integer id){
         Optional<User> optionalUser = userCrud.findById(id);
 
         if(optionalUser.isEmpty()){
-            throw new BusinessException(HttpStatus.NOT_FOUND,"User not exists");
+            throw new BusinessException(HttpStatus.NOT_FOUND, "El usuario no ha sido encontrado");
         }
 
         return optionalUser.get();
+    }
+
+
+
+    public ResponseSuccessfullyDto updateAuthenticationStatus(Integer userId, Boolean status){
+
+        User user = getById(userId);
+        user.setAuthentication(status);
+        try{
+            userCrud.save(user);
+            return ResponseSuccessfullyDto.builder()
+                    .code(HttpStatus.OK)
+                    .message(status ? "Autenticacion en 2 pasos fué activado" : "Autenticacion en 2 pasos ha sido desactivado").build();
+        }catch (Exception exception){
+            throw new BusinessException(HttpStatus.BAD_REQUEST,"Error al actualizar los permisos de autenticación en 2 pasos.");
+        }
     }
 
 }
