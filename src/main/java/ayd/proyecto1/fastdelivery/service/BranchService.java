@@ -103,4 +103,14 @@ public class BranchService {
         }
     }
 
+    public Branch getById(Integer branchId){
+        Optional<Branch> optionalBranch = branchCrud.findById(branchId);
+
+        if(optionalBranch.isEmpty()){
+            throw new BusinessException(HttpStatus.NOT_FOUND,"La sucursal no ha sido encontrada");
+        }
+
+        return optionalBranch.get();
+    }
+
 }
