@@ -16,9 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -51,12 +49,15 @@ public class UserService {
         user.setRole(role);
 
         try{
-            userCrud.save(user);
+            User savedUser = userCrud.save(user);
             log.info("User was saved successfully.");
+            Map<String, Integer> responseBody = new HashMap<>();
+            responseBody.put("userId", savedUser.getId());
             return ResponseSuccessfullyDto
                     .builder()
                     .code(HttpStatus.CREATED)
                     .message("El usuario fué creado correctamente")
+                    .body(responseBody)
                     .build();
         }catch (Exception exception){
             throw new BusinessException(HttpStatus.BAD_REQUEST,"Error al intentar guardar añ usuario.");
