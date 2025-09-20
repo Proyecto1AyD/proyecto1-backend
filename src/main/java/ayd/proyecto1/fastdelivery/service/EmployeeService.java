@@ -2,6 +2,10 @@ package ayd.proyecto1.fastdelivery.service;
 
 import ayd.proyecto1.fastdelivery.dto.request.NewCoordinatorEmployeeDto;
 import ayd.proyecto1.fastdelivery.dto.request.NewDeliveryPersonDto;
+import ayd.proyecto1.fastdelivery.dto.request.UpdateCoordinatorDto;
+import ayd.proyecto1.fastdelivery.dto.request.UpdateDeliveryPersonDto;
+import ayd.proyecto1.fastdelivery.dto.response.CoordinatorInfoDto;
+import ayd.proyecto1.fastdelivery.dto.response.DeliveryPersonInfoDto;
 import ayd.proyecto1.fastdelivery.dto.response.ResponseSuccessfullyDto;
 import ayd.proyecto1.fastdelivery.exception.BusinessException;
 import ayd.proyecto1.fastdelivery.repository.crud.BranchCrud;
@@ -9,10 +13,13 @@ import ayd.proyecto1.fastdelivery.repository.crud.CoordinatorCrud;
 import ayd.proyecto1.fastdelivery.repository.crud.DeliveryPersonCrud;
 import ayd.proyecto1.fastdelivery.repository.entities.*;
 import lombok.RequiredArgsConstructor;
+import org.apache.catalina.LifecycleState;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -22,9 +29,11 @@ public class EmployeeService {
 
     private final BranchCrud branchCrud;
 
+    private final BranchService branchService;
+
     private final CoordinatorCrud coordinatorCrud;
 
-    private DeliveryPersonCrud deliveryPersonCrud;
+    private final DeliveryPersonCrud deliveryPersonCrud;
 
     private final ContractService contractService;
 
@@ -72,5 +81,141 @@ public class EmployeeService {
 
 
 
+    public ResponseSuccessfullyDto updateCoordinatorEmployee(UpdateCoordinatorDto updateCoordinatorDto){
+
+        Optional<Coordinator> optionalCoordinator = coordinatorCrud.findById(updateCoordinatorDto.getId());
+
+        if(optionalCoordinator.isEmpty()) {
+            throw new BusinessException(HttpStatus.NOT_FOUND,"El usuario coordinador no ha sido encontrado");
+        }
+
+        User user = userService.getById(updateCoordinatorDto.getUserId());
+        Optional<Branch> optionalBranch = branchCrud.findById(updateCoordinatorDto.getBranchId());
+
+        if(optionalBranch.isEmpty()){
+            throw new BusinessException(HttpStatus.NOT_FOUND,"Error al obtener la sucursal, no ha sido encontrada");
+        }
+
+        Branch branch = optionalBranch.get();
+
+        Coordinator coordinator = optionalCoordinator.get();
+        coordinator.setUser(user);
+        coordinator.setBranch(branch);
+        coordinatorCrud.save(coordinator);
+
+        return ResponseSuccessfullyDto.builder().code(HttpStatus.OK).message("Informacion de Coordinador actualizada").build();
+    }
+
+
+    public ResponseSuccessfullyDto updateDeliveryPerson(UpdateDeliveryPersonDto updateDeliveryPersonDto){
+
+        User user = userService.getById(updateDeliveryPersonDto.getUserId());
+        Branch branch = branchService.getById(updateDeliveryPersonDto.getBranchId());
+        Contract contract = contractService.getContractById(updateDeliveryPersonDto.getContractId());
+
+        Optional<DeliveryPerson> optionalDeliveryPerson = deliveryPersonCrud.findById(updateDeliveryPersonDto.getId());
+
+        if(optionalDeliveryPerson.isEmpty()){
+            throw new BusinessException(HttpStatus.NOT_FOUND,"El repartidor no ha sido encontrado");
+        }
+
+        DeliveryPerson deliveryPerson = optionalDeliveryPerson.get();
+        deliveryPerson.setUser(user);
+        deliveryPerson.setBranch(branch);
+        deliveryPerson.setContract(contract);
+        deliveryPerson.setWallet(updateDeliveryPersonDto.getWallet());
+        deliveryPerson.setAvailable(updateDeliveryPersonDto.getAvailable());
+
+        try{
+            deliveryPersonCrud.save(deliveryPerson);
+        }catch (Exception exception){
+            throw new BusinessException(HttpStatus.BAD_REQUEST,"Error al actualizar información del Repartidor");
+        }
+
+        return ResponseSuccessfullyDto.builder().code(HttpStatus.OK).message("Información del repartidor actualizada correctamente").build();
+    }
+
+
+    public DeliveryPerson getDeliveryPersonById(Integer id){
+        Optional<DeliveryPerson> optionalDeliveryPerson = deliveryPersonCrud.findById(id);
+
+        if(optionalDeliveryPerson.isEmpty()){
+            throw new BusinessException(HttpStatus.NOT_FOUND,"El repartidor no ha sido encontrado");
+        }
+
+        return optionalDeliveryPerson.get();
+    }
+
+
+    public ResponseSuccessfullyDto getDeliveryPersonInfoById(Integer id){
+
+        DeliveryPerson deliveryPerson = getDeliveryPersonById(id);
+        DeliveryPersonInfoDto deliveryPersonInfoDto = DeliveryPersonInfoDto.builder()
+                .id(deliveryPerson.getId()).wallet(deliveryPerson.getWallet())
+                .userId(deliveryPerson.getUser().getId()).branchId(deliveryPerson.getBranch().getId())
+                .contractId(deliveryPerson.getContract().getId())
+                .available(deliveryPerson.getAvailable()).build();
+
+        return ResponseSuccessfullyDto.builder().code(HttpStatus.OK).message("Repartidor encontrado").body(deliveryPersonInfoDto).build();
+    }
+
+    public Coordinator getCoordinatorById(Integer id){
+
+        Optional<Coordinator> optionalCoordinator = coordinatorCrud.findById(id);
+
+        if(optionalCoordinator.isEmpty()){
+            throw new BusinessException(HttpStatus.NOT_FOUND,"El coordinador no ha sido encontrado");
+        }
+
+        return optionalCoordinator.get();
+    }
+
+
+    public ResponseSuccessfullyDto getCoordinatorInfoById(Integer id){
+        Coordinator coordinator = getCoordinatorById(id);
+
+        CoordinatorInfoDto coordinatorInfoDto = CoordinatorInfoDto.builder()
+                .id(coordinator.getId())
+                .userId(coordinator.getUser().getId())
+                .branchId(coordinator.getBranch().getId())
+                .build();
+
+        return ResponseSuccessfullyDto.builder().code(HttpStatus.OK).message("Coordinador encontrad").body(coordinatorInfoDto).build();
+    }
+
+    public ResponseSuccessfullyDto getAllCoordinatorInfo(){
+        List<Coordinator> coordinatorList = coordinatorCrud.findAll();
+        List<CoordinatorInfoDto> coordinatorInfoDtoList = new ArrayList<>();
+
+        coordinatorList.forEach(coordinator -> {
+            CoordinatorInfoDto coordinatorInfoDto = CoordinatorInfoDto.builder()
+                    .id(coordinator.getId())
+                    .userId(coordinator.getUser().getId())
+                    .branchId(coordinator.getBranch().getId())
+                    .build();
+
+            coordinatorInfoDtoList.add(coordinatorInfoDto);
+        });
+
+        return ResponseSuccessfullyDto.builder().code(HttpStatus.OK).body(coordinatorInfoDtoList).build();
+    }
+
+
+    public ResponseSuccessfullyDto getAllDeliveryPersonInfo(){
+
+        List<DeliveryPerson> deliveryPersonList = deliveryPersonCrud.findAll();
+        List<DeliveryPersonInfoDto> deliveryPersonInfoDtoList = new ArrayList<>();
+
+        deliveryPersonList.forEach(deliveryPerson -> {
+            DeliveryPersonInfoDto deliveryPersonInfoDto = DeliveryPersonInfoDto.builder()
+                    .id(deliveryPerson.getId()).wallet(deliveryPerson.getWallet())
+                    .userId(deliveryPerson.getUser().getId()).branchId(deliveryPerson.getBranch().getId())
+                    .contractId(deliveryPerson.getContract().getId())
+                    .available(deliveryPerson.getAvailable()).build();
+            deliveryPersonInfoDtoList.add(deliveryPersonInfoDto);
+        });
+
+        return ResponseSuccessfullyDto.builder().code(HttpStatus.OK).body(deliveryPersonList).build();
+    }
 
 }

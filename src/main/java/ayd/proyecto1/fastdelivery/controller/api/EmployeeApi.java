@@ -2,12 +2,11 @@ package ayd.proyecto1.fastdelivery.controller.api;
 
 import ayd.proyecto1.fastdelivery.dto.request.NewCoordinatorEmployeeDto;
 import ayd.proyecto1.fastdelivery.dto.request.NewDeliveryPersonDto;
+import ayd.proyecto1.fastdelivery.dto.request.UpdateCoordinatorDto;
+import ayd.proyecto1.fastdelivery.dto.request.UpdateDeliveryPersonDto;
 import ayd.proyecto1.fastdelivery.dto.response.ResponseSuccessfullyDto;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/employee")
 public interface EmployeeApi {
@@ -21,6 +20,28 @@ public interface EmployeeApi {
     @PostMapping("/delivery")
     ResponseEntity<ResponseSuccessfullyDto> createDeliveryEmployee(@RequestBody NewDeliveryPersonDto newDeliveryPersonDto,
                                                                       @RequestHeader(value = "authorization") Integer userId);
+
+    @PutMapping("/delivery")
+    ResponseEntity<ResponseSuccessfullyDto> updateDeliveryPerson(@RequestBody UpdateDeliveryPersonDto updateDeliveryPersonDto,
+                                                                 @RequestHeader(value = "authorization") Integer token);
+
+    @PutMapping("/coordinator")
+    ResponseEntity<ResponseSuccessfullyDto> updateCoordinator(@RequestBody UpdateCoordinatorDto updateCoordinatorDto,
+                                                              @RequestHeader(value = "authorization") Integer token);
+
+    @GetMapping("/coordinator/{id}")
+    ResponseEntity<ResponseSuccessfullyDto> getCoordinator(@PathVariable(name ="id") Integer coordinatorId,
+                                                           @RequestHeader(value = "authorization") Integer token);
+
+    @GetMapping("/delivery/{id}")
+    ResponseEntity<ResponseSuccessfullyDto> getDeliveryPerson(@PathVariable(value = "id") Integer deliveryPersonId,
+                                                           @RequestHeader(value = "authorization") Integer token);
+
+    @GetMapping("/delivery/all")
+    ResponseEntity<ResponseSuccessfullyDto> getAllDeliveryPerson(@RequestHeader(value = "authorization") Integer token);
+
+    @GetMapping("/coordinator/all")
+    ResponseEntity<ResponseSuccessfullyDto> getAllCoordinator(@RequestHeader(value = "authorization") Integer token);
 
 
 }
