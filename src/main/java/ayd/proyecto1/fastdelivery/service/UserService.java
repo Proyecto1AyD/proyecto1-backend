@@ -65,7 +65,7 @@ public class UserService {
     }
 
     public ResponseSuccessfullyDto login(LoginDto loginDto){
-
+        String message = "Inicio de sesión exitoso";
         Optional<User> optionalUser = userCrud.getUserByUsername(loginDto.getUsername());
 
         if(optionalUser.isEmpty()){
@@ -81,11 +81,7 @@ public class UserService {
         if(user.getAuthentication()){
             log.info("Send code to user...");
             sendCodeToUser(user);
-
-            return ResponseSuccessfullyDto.builder()
-                    .code(HttpStatus.OK)
-                    .message("Se ha enviado un código de verificación a su correo electrónico!")
-                    .build();
+            message = "Se ha enviado un código a su correo electrónico, ingresarlo para confirmar el inicio de ssión";
         }
 
         UserInfoDto userInfoDto = UserInfoDto.builder()
@@ -95,7 +91,7 @@ public class UserService {
                 .autentication(user.getAuthentication())
                 .build();
 
-        return ResponseSuccessfullyDto.builder().code(HttpStatus.ACCEPTED).message("Inicio de sesión exitoso").body(userInfoDto).build();
+        return ResponseSuccessfullyDto.builder().code(HttpStatus.ACCEPTED).message(message).body(userInfoDto).build();
     }
 
 
