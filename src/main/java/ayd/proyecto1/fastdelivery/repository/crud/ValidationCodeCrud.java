@@ -11,7 +11,7 @@ import java.util.Optional;
 public interface ValidationCodeCrud extends JpaRepository<ValidationCode, Integer> {
 
 
-    @Query(value = "select * from validation_code where user_id = ? ;", nativeQuery = true)
+    @Query(value = "select * from validation_code where id_user = ? ;", nativeQuery = true)
     Optional<ValidationCode> getByUser(Integer userId);
 
 

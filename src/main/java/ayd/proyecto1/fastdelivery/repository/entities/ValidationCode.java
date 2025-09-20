@@ -28,10 +28,11 @@ public class ValidationCode {
     @Column(name = "is_used")
     private Boolean isUsed;
 
+    @Column(name = "attemps")
     private Integer attempts;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id",referencedColumnName = "id")
+    @JoinColumn(name = "id_user",referencedColumnName = "id")
     private User user;
 
 }
