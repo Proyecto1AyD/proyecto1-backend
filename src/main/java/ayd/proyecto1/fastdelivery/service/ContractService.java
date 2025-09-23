@@ -14,6 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 
@@ -55,8 +57,10 @@ public class ContractService {
         contract.setMonths(newContractDto.getMonths());
 
         try{
-            contractCrud.save(contract);
-            return ResponseSuccessfullyDto.builder().code(HttpStatus.CREATED).message("El contrato fue registrado exitosamente").build();
+            Contract contract1 = contractCrud.save(contract);
+            Map<String, Integer> responseBody = new HashMap<>();
+            responseBody.put("contractID", contract1.getId());
+            return ResponseSuccessfullyDto.builder().code(HttpStatus.CREATED).message("El contrato fue registrado exitosamente").body(responseBody).build();
         }catch (Exception exception){
             throw new BusinessException(HttpStatus.BAD_REQUEST,"Error al intentar guardar un contrato");
         }

@@ -1,4 +1,4 @@
-package ayd.proyecto1.fastdelivery.dto.request;
+package ayd.proyecto1.fastdelivery.dto.response;
 
 
 import lombok.Builder;
@@ -8,12 +8,18 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class NewDeliveryPersonDto {
+public class DeliveryPersonDto {
+
+    private Integer id;
 
     private Integer userId;
+
+    private Double wallet;
 
     private Integer contractId;
 
     private Integer branchId;
+
+    private Boolean available;
 
 }

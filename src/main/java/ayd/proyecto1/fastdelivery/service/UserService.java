@@ -16,9 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -51,12 +49,15 @@ public class UserService {
         user.setRole(role);
 
         try{
-            userCrud.save(user);
+            User usertemp = userCrud.save(user);
             log.info("User was saved successfully.");
+            Map<String, Integer> responseBody = new HashMap<>();
+            responseBody.put("userId", usertemp.getId());
             return ResponseSuccessfullyDto
                     .builder()
                     .code(HttpStatus.CREATED)
                     .message("El usuario fué creado correctamente")
+                    .body(responseBody)
                     .build();
         }catch (Exception exception){
             throw new BusinessException(HttpStatus.BAD_REQUEST,"Error al intentar guardar añ usuario.");
@@ -128,12 +129,12 @@ public class UserService {
         }
     }
 
-    public ResponseSuccessfullyDto getAllBussines(){
+    public ResponseSuccessfullyDto getAllByIdRole(Integer idRole){
 
-        List<User> bussines = userCrud.getUserByIdRole(4);
+        List<User> users = userCrud.getUserByIdRole(idRole);
         List<BussinesInfoDto> bussinesInfoDtoList = new ArrayList<>();
-        Role role = roleService.getRoleById(4);
-        bussines.forEach(bussines1 -> {
+        Role role = roleService.getRoleById(idRole);
+        users.forEach(bussines1 -> {
             BussinesInfoDto bussineInfoDto = BussinesInfoDto.builder().userId(bussines1.getId()).name(bussines1.getName()).username(bussines1.getUsername()).role(role.getRole()).email(bussines1.getEmail()).phone(bussines1.getPhone()).address(bussines1.getAddress()).build();
             bussinesInfoDtoList.add(bussineInfoDto);
         });

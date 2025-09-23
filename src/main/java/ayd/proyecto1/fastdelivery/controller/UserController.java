@@ -54,7 +54,21 @@ public class UserController implements UserApi {
     public ResponseEntity<ResponseSuccessfullyDto> getAllBussines(Integer authorization) {
         log.info("GET user/allBussines");
         userService.validateAuthorizationHeader(authorization);
-        ResponseSuccessfullyDto responseSuccessfullyDto = userService.getAllBussines();
+        ResponseSuccessfullyDto responseSuccessfullyDto = userService.getAllByIdRole(4);
+        return ResponseEntity.ok(responseSuccessfullyDto);
+    }
+
+    public ResponseEntity<ResponseSuccessfullyDto> getAllDeliveryPersons (Integer authorization) {
+        log.info("GET user/allDeliveryPerson");
+        userService.validateAuthorizationHeader(authorization);
+        ResponseSuccessfullyDto responseSuccessfullyDto = userService.getAllByIdRole(3);
+        return ResponseEntity.ok(responseSuccessfullyDto);
+    }
+
+    public ResponseEntity<ResponseSuccessfullyDto> getAllCoordinators(Integer authorization) {
+        log.info("GET user/allCoordinators");
+        userService.validateAuthorizationHeader(authorization);
+        ResponseSuccessfullyDto responseSuccessfullyDto = userService.getAllByIdRole(2);
         return ResponseEntity.ok(responseSuccessfullyDto);
     }
 

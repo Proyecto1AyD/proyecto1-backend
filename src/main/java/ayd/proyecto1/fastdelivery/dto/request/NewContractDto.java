@@ -12,7 +12,6 @@ import java.util.Date;
 @Builder
 public class NewContractDto {
 
-
     private Integer commission;
 
     private LocalDate startDate;
