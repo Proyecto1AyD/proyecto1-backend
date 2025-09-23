@@ -218,4 +218,40 @@ public class EmployeeService {
         return ResponseSuccessfullyDto.builder().code(HttpStatus.OK).body(deliveryPersonList).build();
     }
 
+    public ResponseSuccessfullyDto deleteEmployee(Integer id, Boolean isDeliveryPerson){
+
+        if (isDeliveryPerson){
+            Optional<DeliveryPerson> optionalDeliveryPerson = deliveryPersonCrud.findById(id);
+
+            if(optionalDeliveryPerson.isEmpty()){
+                throw new BusinessException(HttpStatus.NOT_FOUND,"El Repartidor no ha sido encontrado");
+            }
+
+            DeliveryPerson deliveryPerson = optionalDeliveryPerson.get();
+
+            try{
+                deliveryPersonCrud.delete(deliveryPerson);
+                return ResponseSuccessfullyDto.builder().code(HttpStatus.ACCEPTED).message("Repartidor eliminado exitosamente").build();
+            }catch (Exception exception){
+                throw new BusinessException(HttpStatus.BAD_REQUEST,"Error al eliminar al Repartidor");
+            }
+        }else{
+            Optional<Coordinator> optionalCoordinator = coordinatorCrud.findById(id);
+
+            if(optionalCoordinator.isEmpty()){
+                throw new BusinessException(HttpStatus.NOT_FOUND,"El Coordinador no ha sido encontrado");
+            }
+
+            Coordinator coordinator = optionalCoordinator.get();
+
+            try{
+                coordinatorCrud.delete(coordinator);
+                return ResponseSuccessfullyDto.builder().code(HttpStatus.ACCEPTED).message("Coordinador eliminado exitosamente").build();
+            }catch (Exception exception){
+                throw new BusinessException(HttpStatus.BAD_REQUEST,"Error al eliminar al Coordinador");
+            }
+        }
+
+    }
+
 }
