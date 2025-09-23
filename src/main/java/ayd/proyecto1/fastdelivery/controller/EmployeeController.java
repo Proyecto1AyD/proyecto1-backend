@@ -87,4 +87,20 @@ public class EmployeeController implements EmployeeApi {
         ResponseSuccessfullyDto responseSuccessfullyDto = employeeService.getAllCoordinatorInfo();
         return new ResponseEntity<>(responseSuccessfullyDto,responseSuccessfullyDto.getCode());
     }
+
+    @Override
+    public ResponseEntity<ResponseSuccessfullyDto> deleteDeliveryPerson(Integer id, Integer userId) {
+        log.info("DELETE employee/delivery");
+        userService.validateAuthorizationHeader(userId);
+        ResponseSuccessfullyDto responseSuccessfullyDto = employeeService.deleteEmployee(id,true);
+        return ResponseEntity.ok(responseSuccessfullyDto);
+    }
+
+    @Override
+    public ResponseEntity<ResponseSuccessfullyDto> deleteCoordinator(Integer id, Integer userId) {
+        log.info("DELETE employee/coordinator");
+        userService.validateAuthorizationHeader(userId);
+        ResponseSuccessfullyDto responseSuccessfullyDto = employeeService.deleteEmployee(id, false);
+        return ResponseEntity.ok(responseSuccessfullyDto);
+    }
 }

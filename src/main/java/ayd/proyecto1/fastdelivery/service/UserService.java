@@ -125,12 +125,12 @@ public class UserService {
         }
     }
 
-    public ResponseSuccessfullyDto getAllBussines(){
+    public ResponseSuccessfullyDto getAllByIdRole(Integer idRole){
 
-        List<User> bussines = userCrud.getUserByIdRole(4);
+        List<User> users = userCrud.getUserByIdRole(idRole);
         List<BussinesInfoDto> bussinesInfoDtoList = new ArrayList<>();
-        Role role = roleService.getRoleById(4);
-        bussines.forEach(bussines1 -> {
+        Role role = roleService.getRoleById(idRole);
+        users.forEach(bussines1 -> {
             BussinesInfoDto bussineInfoDto = BussinesInfoDto.builder().userId(bussines1.getId()).name(bussines1.getName()).username(bussines1.getUsername()).role(role.getRole()).email(bussines1.getEmail()).phone(bussines1.getPhone()).address(bussines1.getAddress()).build();
             bussinesInfoDtoList.add(bussineInfoDto);
         });

@@ -43,5 +43,11 @@ public interface EmployeeApi {
     @GetMapping("/coordinator/all")
     ResponseEntity<ResponseSuccessfullyDto> getAllCoordinator(@RequestHeader(value = "authorization") Integer token);
 
+    @DeleteMapping("/{id}")
+    ResponseEntity<ResponseSuccessfullyDto> deleteDeliveryPerson(@PathVariable Integer id, @RequestHeader(value = "authorization") Integer userId);
+
+    @DeleteMapping("/coordinator/{id}")
+    ResponseEntity<ResponseSuccessfullyDto> deleteCoordinator(@PathVariable Integer id, @RequestHeader(value = "authorization") Integer userId);
+
 
 }

@@ -24,6 +24,12 @@ public interface UserApi {
     @GetMapping("/allBussines")
     ResponseEntity<ResponseSuccessfullyDto> getAllBussines(@RequestHeader(value = "authorization") Integer authorization);
 
+    @GetMapping("/allDeliveryPerson")
+    ResponseEntity<ResponseSuccessfullyDto> getAllDeliveryPersons(@RequestHeader(value = "authorization") Integer authorization);
+
+    @GetMapping("/allCoordinators")
+    ResponseEntity<ResponseSuccessfullyDto> getAllCoordinators(@RequestHeader(value = "authorization") Integer authorization);
+
     @GetMapping("/all")
     ResponseEntity<ResponseSuccessfullyDto> getAll(@RequestHeader(value = "authorization") Integer authorization);
 
