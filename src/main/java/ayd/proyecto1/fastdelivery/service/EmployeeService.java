@@ -37,9 +37,22 @@ public class EmployeeService {
 
     private final ContractService contractService;
 
+    private static final Integer COORDINATOR_ID = 2;
+
+    private static final Integer DELIVERY_PERSON_ID = 3;
+
+
     public ResponseSuccessfullyDto createCoordinator(NewCoordinatorEmployeeDto newCoordinatorEmployeeDto){
 
         User user = userService.getById(newCoordinatorEmployeeDto.getUserId());
+        if(coordinatorCrud.getByIdUser(user.getId())!=null){
+            throw new BusinessException(HttpStatus.FOUND, "Coordinador ya está registrado");
+        }
+
+        if(!user.getRole().getId().equals(COORDINATOR_ID)){
+            throw new BusinessException(HttpStatus.UNAUTHORIZED,"El usuario no corresponde a un Coordinador");
+        }
+
         Branch branch = branchCrud.findById(newCoordinatorEmployeeDto.getBranchId()).get();
 
         Coordinator coordinator = new Coordinator();
@@ -59,9 +72,18 @@ public class EmployeeService {
     public ResponseSuccessfullyDto createDeliveryPerson(NewDeliveryPersonDto newDeliveryPersonDto){
 
         User user = userService.getById(newDeliveryPersonDto.getUserId());
-        Branch branch = branchCrud.findById(newDeliveryPersonDto.getBranchId()).get();
-        Contract contract = contractService.getContractById(newDeliveryPersonDto.getContractId());
+        if(deliveryPersonCrud.getByIdUser(user.getId())!=null){
+            throw new BusinessException(HttpStatus.FOUND, "Repartidor ya está registrado.");
+        }
 
+        if(!user.getRole().getId().equals(DELIVERY_PERSON_ID)){
+            throw new BusinessException(HttpStatus.UNAUTHORIZED,"El usuario no corresponde a un Repartidor.");
+        }
+        Branch branch = branchCrud.findById(newDeliveryPersonDto.getBranchId()).get();
+        Contract contract = contractService.getContractByIdContract(newDeliveryPersonDto.getContractId());
+        if(deliveryPersonCrud.getByIdContract(contract.getId())!=null){
+            throw new BusinessException(HttpStatus.FOUND, "El contrato ya está asignado a otro repartidor.");
+        }
         DeliveryPerson deliveryPerson = new DeliveryPerson();
         deliveryPerson.setUser(user);
         deliveryPerson.setBranch(branch);
@@ -78,8 +100,6 @@ public class EmployeeService {
 
         return ResponseSuccessfullyDto.builder().code(HttpStatus.CREATED).message("El usuario a sido registrado con éxito").build();
     }
-
-
 
     public ResponseSuccessfullyDto updateCoordinatorEmployee(UpdateCoordinatorDto updateCoordinatorDto){
 
@@ -111,7 +131,7 @@ public class EmployeeService {
 
         User user = userService.getById(updateDeliveryPersonDto.getUserId());
         Branch branch = branchService.getById(updateDeliveryPersonDto.getBranchId());
-        Contract contract = contractService.getContractById(updateDeliveryPersonDto.getContractId());
+        Contract contract = contractService.getContractByIdContract(updateDeliveryPersonDto.getContractId());
 
         Optional<DeliveryPerson> optionalDeliveryPerson = deliveryPersonCrud.findById(updateDeliveryPersonDto.getId());
 
