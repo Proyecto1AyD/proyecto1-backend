@@ -31,7 +31,7 @@ public class Contract {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_status", referencedColumnName = "id")
     private ContractStatus status;
-
+/*
     @OneToMany(mappedBy = "contract", fetch = FetchType.LAZY)
-    private List<ContractLog> logs;
+    private List<ContractLog> logs;*/
 }

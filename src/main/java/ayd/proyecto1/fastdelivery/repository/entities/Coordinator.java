@@ -22,10 +22,10 @@ public class Coordinator {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_branch", referencedColumnName = "id")
     private Branch branch;
-
+/*
     @OneToMany(mappedBy = "coordinator", fetch = FetchType.LAZY)
     private List<ChatCoordinatorBusiness> chatCoordinatorBusinesses;
 
     @OneToMany(mappedBy = "coordinator", fetch = FetchType.LAZY)
-    private List<ChatCoordinatorDeliveryPerson> chatCoordinatorDeliveryPeople;
+    private List<ChatCoordinatorDeliveryPerson> chatCoordinatorDeliveryPeople;*/
 }

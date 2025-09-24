@@ -23,7 +23,7 @@ public class ContractType {
     private LocalTime exitTime;
 
     private Double baseSalary;
-
+/*
     @OneToMany(mappedBy = "contractType", fetch = FetchType.LAZY)
-    private List<Contract> contracts;
+    private List<Contract> contracts;*/
 }

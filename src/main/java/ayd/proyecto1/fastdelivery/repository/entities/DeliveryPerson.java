@@ -31,10 +31,10 @@ public class DeliveryPerson {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_user", referencedColumnName = "id")
     private User user;
-
+/*
     @OneToMany(mappedBy = "deliveryPerson", fetch = FetchType.LAZY)
     private List<DeliveryOrderAssignment> deliveryOrderAssignments;
 
     @OneToMany(mappedBy = "deliveryPerson", fetch = FetchType.LAZY)
-    private List<WorkHistory> workHistories;
+    private List<WorkHistory> workHistories;*/
 }

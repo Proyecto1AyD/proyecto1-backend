@@ -16,5 +16,4 @@ public class NewDeliveryPersonDto {
 
     private Integer branchId;
 
-
 }
