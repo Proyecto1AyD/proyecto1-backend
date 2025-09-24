@@ -22,7 +22,7 @@ public class WorkHistory {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_delivery_person", referencedColumnName = "id")
     private DeliveryPerson deliveryPerson;
-
+/*
     @OneToMany(mappedBy = "workHistory", fetch = FetchType.LAZY)
-    private List<WorkHistoryDetail> details;
+    private List<WorkHistoryDetail> details;*/
 }

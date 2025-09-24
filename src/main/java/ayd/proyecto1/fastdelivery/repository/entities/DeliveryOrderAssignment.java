@@ -24,7 +24,7 @@ public class DeliveryOrderAssignment {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_delivery_person", referencedColumnName = "id")
     private DeliveryPerson deliveryPerson;
-
+/*
     @OneToMany(mappedBy = "deliveryOrderAssignment", fetch = FetchType.LAZY)
-    private List<ChatCoordinatorDeliveryPerson> chatCoordinatorDeliveryPeople;
+    private List<ChatCoordinatorDeliveryPerson> chatCoordinatorDeliveryPeople;*/
 }

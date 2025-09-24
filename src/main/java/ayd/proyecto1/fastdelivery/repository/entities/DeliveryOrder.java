@@ -35,7 +35,7 @@ public class DeliveryOrder {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_delivery_order_status", referencedColumnName = "id")
     private DeliveryOrderStatus deliveryOrderStatus;
-
+/*
     @OneToMany(mappedBy = "deliveryOrder", fetch = FetchType.LAZY)
     private List<DeliveryOrderLog> logs;
 
@@ -43,5 +43,5 @@ public class DeliveryOrder {
     private List<DeliveryEvidence> evidences;
 
     @OneToMany(mappedBy = "deliveryOrder", fetch = FetchType.LAZY)
-    private List<Incident> incidents;
+    private List<Incident> incidents;*/
 }

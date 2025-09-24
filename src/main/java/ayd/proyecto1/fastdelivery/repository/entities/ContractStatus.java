@@ -16,7 +16,7 @@ public class ContractStatus {
     private Integer id;
 
     private String status;
-
+/*
     @OneToMany(mappedBy = "status", fetch = FetchType.LAZY)
-    private List<Contract> contracts;
+    private List<Contract> contracts;*/
 }

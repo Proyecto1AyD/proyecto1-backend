@@ -16,7 +16,7 @@ public class DeliveryOrderStatus {
     private Integer id;
 
     private String status;
-
+/*
     @OneToMany(mappedBy = "deliveryOrderStatus", fetch = FetchType.LAZY)
-    private List<DeliveryOrder> deliveryOrders;
+    private List<DeliveryOrder> deliveryOrders;*/
 }

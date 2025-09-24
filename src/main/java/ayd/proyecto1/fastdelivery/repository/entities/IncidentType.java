@@ -18,7 +18,7 @@ public class IncidentType {
     private String description;
 
     private Boolean isCustomer;
-
+/*
     @OneToMany(mappedBy = "incidentType", fetch = FetchType.LAZY)
-    private List<Incident> incidents;
+    private List<Incident> incidents;*/
 }
