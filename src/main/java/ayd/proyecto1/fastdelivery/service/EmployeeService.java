@@ -235,7 +235,7 @@ public class EmployeeService {
             deliveryPersonInfoDtoList.add(deliveryPersonInfoDto);
         });
 
-        return ResponseSuccessfullyDto.builder().code(HttpStatus.OK).body(deliveryPersonList).build();
+        return ResponseSuccessfullyDto.builder().code(HttpStatus.OK).body(deliveryPersonInfoDtoList).build();
     }
 
     public ResponseSuccessfullyDto deleteEmployee(Integer id, Boolean isDeliveryPerson){
