@@ -24,6 +24,9 @@ public interface DeliveryOrderApi {
     @PutMapping
     ResponseEntity<ResponseSuccessfullyDto> updateDeliveryOrder(@RequestBody DeliveryOrderDto deliveryOrderDto);
 
+    @PutMapping("/restricted")
+    ResponseEntity<ResponseSuccessfullyDto> updateDeliveryOrderRestricted(@RequestBody DeliveryOrderDto deliveryOrderDto);
+
     @DeleteMapping("{id}")
     ResponseEntity<ResponseSuccessfullyDto> deleteDeliveryOrder(@PathVariable Integer id);
 }
