@@ -1,0 +1,62 @@
+package ayd.proyecto1.fastdelivery.controller;
+
+import ayd.proyecto1.fastdelivery.controller.api.DeliveryOrderApi;
+import ayd.proyecto1.fastdelivery.dto.request.NewDeliveryOrderDto;
+import ayd.proyecto1.fastdelivery.dto.response.DeliveryOrderDto;
+import ayd.proyecto1.fastdelivery.dto.response.ResponseSuccessfullyDto;
+import ayd.proyecto1.fastdelivery.service.DeliveryOrderService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RestController;
+
+@Slf4j
+@RequiredArgsConstructor
+@RestController
+public class DeliveryOrderController implements DeliveryOrderApi {
+
+    private final DeliveryOrderService deliveryOrderService;
+
+    @Override
+    public ResponseEntity<ResponseSuccessfullyDto> createDeliveryOrder(NewDeliveryOrderDto newDeliveryOrderDto) {
+        log.info("POST deliveryOrder/create");
+        ResponseSuccessfullyDto response = deliveryOrderService.createDeliveryOrder(newDeliveryOrderDto);
+        return ResponseEntity.status(response.getCode()).body(response);
+    }
+
+    @Override
+    public ResponseEntity<ResponseSuccessfullyDto> getDeliveryOrderById(Integer id) {
+        log.info("GET deliveryOrder/{}", id);
+        ResponseSuccessfullyDto response = deliveryOrderService.getDeliveryOrderById(id);
+        return ResponseEntity.status(response.getCode()).body(response);
+    }
+
+    @Override
+    public ResponseEntity<ResponseSuccessfullyDto> getDeliveryOrderByIdBusiness(Integer idBusiness) {
+        log.info("GET deliveryOrder/business/{}", idBusiness);
+        ResponseSuccessfullyDto response = deliveryOrderService.getDeliveryOrderByIdBusiness(idBusiness);
+        return ResponseEntity.status(response.getCode()).body(response);
+    }
+
+    @Override
+    public ResponseEntity<ResponseSuccessfullyDto> getAllDeliveryOrder() {
+        log.info("GET deliveryOrder/all");
+        ResponseSuccessfullyDto response = deliveryOrderService.getAllDeliveryOrder();
+        return ResponseEntity.status(response.getCode()).body(response);
+    }
+
+    @Override
+    public ResponseEntity<ResponseSuccessfullyDto> updateDeliveryOrder(DeliveryOrderDto deliveryOrderDto) {
+        log.info("PUT deliveryOrder/update");
+        deliveryOrderService.validateStatusOrderPut(deliveryOrderDto.getId());
+        ResponseSuccessfullyDto response = deliveryOrderService.updateDeliveryOrder(deliveryOrderDto);
+        return ResponseEntity.status(response.getCode()).body(response);
+    }
+
+    @Override
+    public ResponseEntity<ResponseSuccessfullyDto> deleteDeliveryOrder(Integer id) {
+        log.info("DELETE deliveryOrder/delete/{}", id);
+        ResponseSuccessfullyDto response = deliveryOrderService.deleteCard(id);
+        return ResponseEntity.status(response.getCode()).body(response);
+    }
+}
