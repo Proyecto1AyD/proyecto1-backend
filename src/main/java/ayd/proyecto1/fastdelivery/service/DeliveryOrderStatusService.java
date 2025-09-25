@@ -1,6 +1,5 @@
 package ayd.proyecto1.fastdelivery.service;
 
-import ayd.proyecto1.fastdelivery.dto.response.ContractStatusDto;
 import ayd.proyecto1.fastdelivery.dto.response.DeliveryOrderStatusDto;
 import ayd.proyecto1.fastdelivery.dto.response.ResponseSuccessfullyDto;
 import ayd.proyecto1.fastdelivery.exception.BusinessException;
@@ -24,12 +23,7 @@ public class DeliveryOrderStatusService {
     private final DeliveryOrderStatusCrud deliveryOrderStatusCrud;
 
     public ResponseSuccessfullyDto getDeliveryOrderStatusById(Integer id){
-        Optional<DeliveryOrderStatus> deliveryOrderStatus = deliveryOrderStatusCrud.findById(id);
-
-        if(deliveryOrderStatus.isEmpty()){
-            throw new BusinessException(HttpStatus.NOT_FOUND,"El Estado de la Orden no ha sido encontrado");
-        }
-        DeliveryOrderStatus deliveryOrderStatus1 = deliveryOrderStatus.get();
+        DeliveryOrderStatus deliveryOrderStatus1 = getDeliveryOrderStatusByIdDeliveryOrderStatus(id);
         DeliveryOrderStatusDto deliveryOrderStatusDto = DeliveryOrderStatusDto.builder().id(deliveryOrderStatus1.getId()).status(deliveryOrderStatus1.getStatus()).build();
 
         return ResponseSuccessfullyDto.builder().code(HttpStatus.OK).body(deliveryOrderStatusDto).build();
@@ -45,6 +39,17 @@ public class DeliveryOrderStatusService {
         });
 
         return ResponseSuccessfullyDto.builder().code(HttpStatus.OK).body(deliveryOrderStatusDtos).build();
+    }
+
+    public DeliveryOrderStatus getDeliveryOrderStatusByIdDeliveryOrderStatus(Integer id){
+
+        Optional<DeliveryOrderStatus> optionalDeliveryOrderStatus = deliveryOrderStatusCrud.findById(id);
+
+        if(optionalDeliveryOrderStatus.isEmpty()){
+            throw new BusinessException(HttpStatus.NOT_FOUND,"DeliveryOrderStatus not exists");
+        }
+
+        return optionalDeliveryOrderStatus.get();
     }
 
 }

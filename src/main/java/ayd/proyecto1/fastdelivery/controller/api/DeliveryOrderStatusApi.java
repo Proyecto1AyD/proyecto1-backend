@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public interface DeliveryOrderStatusApi {
 
     @GetMapping("/all")
-    ResponseEntity<ResponseSuccessfullyDto> getAllDeliveryOrderStatus(@RequestHeader(value = "authorization") Integer userId);
+    ResponseEntity<ResponseSuccessfullyDto> getAllDeliveryOrderStatus();
 
     @GetMapping("/{id}")
-    ResponseEntity<ResponseSuccessfullyDto> getDeliveryOrderStatusById(@PathVariable Integer id, @RequestHeader(value = "authorization") Integer userId);
+    ResponseEntity<ResponseSuccessfullyDto> getDeliveryOrderStatusById(@PathVariable Integer id);
 }

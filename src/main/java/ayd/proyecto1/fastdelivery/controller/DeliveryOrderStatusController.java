@@ -20,17 +20,15 @@ public class DeliveryOrderStatusController implements DeliveryOrderStatusApi {
     private final UserService userService;
 
     @Override
-    public ResponseEntity<ResponseSuccessfullyDto> getAllDeliveryOrderStatus(Integer userId) {
-        log.info("GET contractStatus/all");
-        userService.validateAuthorizationHeader(userId);
+    public ResponseEntity<ResponseSuccessfullyDto> getAllDeliveryOrderStatus() {
+        log.info("GET deliveryOrderStatus/all");
         ResponseSuccessfullyDto responseSuccessfullyDto = deliveryOrderStatusService.getAllDeliveryOrderStatus();
         return ResponseEntity.ok(responseSuccessfullyDto);
     }
 
     @Override
-    public ResponseEntity<ResponseSuccessfullyDto> getDeliveryOrderStatusById(Integer id, Integer userId) {
-        log.info("GET contractStatus/{}", id);
-        userService.validateAuthorizationHeader(userId);
+    public ResponseEntity<ResponseSuccessfullyDto> getDeliveryOrderStatusById(Integer id) {
+        log.info("GET deliveryOrderStatus/{}", id);
         ResponseSuccessfullyDto responseSuccessfullyDto = deliveryOrderStatusService.getDeliveryOrderStatusById(id);
         return ResponseEntity.ok(responseSuccessfullyDto);
     }
