@@ -48,8 +48,14 @@ public class DeliveryOrderController implements DeliveryOrderApi {
     @Override
     public ResponseEntity<ResponseSuccessfullyDto> updateDeliveryOrder(DeliveryOrderDto deliveryOrderDto) {
         log.info("PUT deliveryOrder/update");
-        deliveryOrderService.validateStatusOrderPut(deliveryOrderDto.getId());
-        ResponseSuccessfullyDto response = deliveryOrderService.updateDeliveryOrder(deliveryOrderDto);
+        ResponseSuccessfullyDto response = deliveryOrderService.updateDeliveryOrder(deliveryOrderDto, false);
+        return ResponseEntity.status(response.getCode()).body(response);
+    }
+
+    @Override
+    public ResponseEntity<ResponseSuccessfullyDto> updateDeliveryOrderRestricted(DeliveryOrderDto deliveryOrderDto) {
+        log.info("PUT deliveryOrder/update/restricted");
+        ResponseSuccessfullyDto response = deliveryOrderService.updateDeliveryOrder(deliveryOrderDto, true);
         return ResponseEntity.status(response.getCode()).body(response);
     }
 

@@ -79,8 +79,10 @@ public class DeliveryOrderService {
         return ResponseSuccessfullyDto.builder().code(HttpStatus.OK).body(deliveryOrderDtos).build();
     }
 
-    public ResponseSuccessfullyDto updateDeliveryOrder(DeliveryOrderDto deliveryOrderDto){
-
+    public ResponseSuccessfullyDto updateDeliveryOrder(DeliveryOrderDto deliveryOrderDto, Boolean isRestricted){
+        if (isRestricted){
+            validateStatusOrderPut(deliveryOrderDto.getId());
+        }
         Optional<DeliveryOrder> optionalDeliveryOrder = deliveryOrderCrud.findById(deliveryOrderDto.getId());
 
         if(optionalDeliveryOrder.isEmpty()){
