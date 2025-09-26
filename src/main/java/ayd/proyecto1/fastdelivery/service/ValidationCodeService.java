@@ -62,7 +62,7 @@ public class ValidationCodeService {
 
         ValidationCode validationCode = optionalValidationCode.get();
 
-        if(!validateCodeDto.getCode().equals(validateCodeDto.getCode())){
+        if(!validateCodeDto.getCode().equals(validationCode.getCode())){
             throw new BusinessException(HttpStatus.UNAUTHORIZED, "El código no le pertenece al usuario que intenta iniciar sesión.");
         }
 
