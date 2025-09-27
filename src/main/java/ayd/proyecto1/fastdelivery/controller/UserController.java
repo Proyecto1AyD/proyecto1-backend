@@ -42,7 +42,7 @@ public class UserController implements UserApi {
 
     @Override
     public ResponseEntity<ResponseSuccessfullyDto> prueba(LoginDto loginDto, String token, String id, String nombre) {
-        log.info("user/test");
+        log.info("POST user/test");
         ResponseSuccessfullyDto responseSuccessfullyDto = ResponseSuccessfullyDto
                 .builder()
                 .code(HttpStatus.OK)
