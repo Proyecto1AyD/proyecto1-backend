@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>ayd.proyecto1</groupId>
 	<artifactId>fastdelivery</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
 	<name>fastdelivery</name>
 	<description>Proyecto 1 - Mensajeria - AyD</description>
 	<url/>
