@@ -29,4 +29,11 @@ public class ContractLogController implements ContractLogApi {
         ResponseSuccessfullyDto responseSuccessfullyDto = contractLogService.getContractLogById(id);
         return ResponseEntity.ok(responseSuccessfullyDto);
     }
+
+    @Override
+    public ResponseEntity<ResponseSuccessfullyDto> getContractLogByIdContract(Integer id) {
+        log.info("GET contractLog/idContract/{}", id);
+        ResponseSuccessfullyDto responseSuccessfullyDto = contractLogService.getContractLogByIdContract(id);
+        return ResponseEntity.ok(responseSuccessfullyDto);
+    }
 }

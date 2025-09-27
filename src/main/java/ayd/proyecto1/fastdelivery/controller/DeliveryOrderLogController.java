@@ -34,4 +34,11 @@ public class DeliveryOrderLogController implements DeliveryOrderLogApi {
         ResponseSuccessfullyDto responseSuccessfullyDto = deliveryOrderLogService.getDeliveryOrderLogById(id);
         return ResponseEntity.ok(responseSuccessfullyDto);
     }
+
+    @Override
+    public ResponseEntity<ResponseSuccessfullyDto> getDeliveryOrderLogByIdDeliveryOrder(Integer id) {
+        log.info("GET deliveryOrderLog/idDeliveryOrder/{}", id);
+        ResponseSuccessfullyDto responseSuccessfullyDto = deliveryOrderLogService.getDeliveryOrderLogByIdDeliveryOrder(id);
+        return ResponseEntity.ok(responseSuccessfullyDto);
+    }
 }

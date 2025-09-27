@@ -1,5 +1,6 @@
 package ayd.proyecto1.fastdelivery.service;
 
+import ayd.proyecto1.fastdelivery.dto.response.ContractLogDto;
 import ayd.proyecto1.fastdelivery.dto.response.DeliveryOrderLogDto;
 import ayd.proyecto1.fastdelivery.dto.response.ResponseSuccessfullyDto;
 import ayd.proyecto1.fastdelivery.exception.BusinessException;
@@ -32,6 +33,18 @@ public class DeliveryOrderLogService {
         DeliveryOrderLogDto logDto = DeliveryOrderLogDto.builder().id(deliveryOrderLog1.getId()).idDeliveryOrder(deliveryOrderLog1.getDeliveryOrder().getId()).date(deliveryOrderLog1.getDate()).time(deliveryOrderLog1.getTime()).action(deliveryOrderLog1.getAction()).build();
 
         return ResponseSuccessfullyDto.builder().code(HttpStatus.OK).body(logDto).build();
+    }
+
+    public ResponseSuccessfullyDto getDeliveryOrderLogByIdDeliveryOrder(Integer id){
+        List<DeliveryOrderLog> contractLog = deliveryOrderLogCrud.getDeliveryOrderLogsByIdDeliveryOrder(id);
+        ArrayList<DeliveryOrderLogDto> deliveryOrderLogDtos = new ArrayList<>();
+
+        contractLog.forEach(deliveryOrderLog1 -> {
+            DeliveryOrderLogDto logDto = DeliveryOrderLogDto.builder().id(deliveryOrderLog1.getId()).idDeliveryOrder(deliveryOrderLog1.getDeliveryOrder().getId()).date(deliveryOrderLog1.getDate()).time(deliveryOrderLog1.getTime()).action(deliveryOrderLog1.getAction()).build();
+            deliveryOrderLogDtos.add(logDto);
+        });
+
+        return ResponseSuccessfullyDto.builder().code(HttpStatus.OK).body(deliveryOrderLogDtos).build();
     }
 
     public ResponseSuccessfullyDto getAllDeliveryOrderLogs(){

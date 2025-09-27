@@ -15,4 +15,7 @@ public interface ContractLogApi {
 
     @GetMapping("/{id}")
     ResponseEntity<ResponseSuccessfullyDto> getContractLogById(@PathVariable Integer id);
+
+    @GetMapping("/idContract/{id}")
+    ResponseEntity<ResponseSuccessfullyDto> getContractLogByIdContract(@PathVariable Integer id);
 }
