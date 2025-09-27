@@ -35,6 +35,19 @@ public class ContractLogService {
         return ResponseSuccessfullyDto.builder().code(HttpStatus.OK).body(logDto).build();
     }
 
+    public ResponseSuccessfullyDto getContractLogByIdContract(Integer id){
+        List<ContractLog> contractLog = contractLogCrud.getContractLogsByIdContract(id);
+
+        ArrayList<ContractLogDto> contractLogDtos = new ArrayList<>();
+
+        contractLog.forEach(contractLog1 -> {
+            ContractLogDto logDto = ContractLogDto.builder().id(contractLog1.getId()).idContract(contractLog1.getContract().getId()).date(contractLog1.getDate()).time(contractLog1.getTime()).action(contractLog1.getAction()).build();
+            contractLogDtos.add(logDto);
+        });
+
+        return ResponseSuccessfullyDto.builder().code(HttpStatus.OK).body(contractLogDtos).build();
+    }
+
     public ResponseSuccessfullyDto getAllContractLogs(){
         List<ContractLog> contractLogs = contractLogCrud.findAll();
         ArrayList<ContractLogDto> contractLogDtos = new ArrayList<>();

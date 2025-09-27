@@ -16,4 +16,7 @@ public interface DeliveryOrderLogApi {
 
     @GetMapping("/{id}")
     ResponseEntity<ResponseSuccessfullyDto> getDeliveryOrderLogById(@PathVariable Integer id);
+
+    @GetMapping("/idDeliveryOrder/{id}")
+    ResponseEntity<ResponseSuccessfullyDto> getDeliveryOrderLogByIdDeliveryOrder(@PathVariable Integer id);
 }
