@@ -35,6 +35,7 @@ public class UserController implements UserApi {
 
     @Override
     public ResponseEntity<ResponseSuccessfullyDto> validateToken(ValidateCodeDto validateCodeDto) {
+        log.info("GET user/code");
         ResponseSuccessfullyDto responseSuccessfullyDto = userService.validateCode(validateCodeDto);
         return new ResponseEntity<>(responseSuccessfullyDto, responseSuccessfullyDto.getCode());
     }
