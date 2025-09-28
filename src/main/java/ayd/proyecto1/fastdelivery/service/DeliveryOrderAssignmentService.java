@@ -4,10 +4,8 @@ import ayd.proyecto1.fastdelivery.dto.request.NewDeliveryOrderAssignmentDto;
 import ayd.proyecto1.fastdelivery.dto.response.DeliveryOrderAssignmentDto;
 import ayd.proyecto1.fastdelivery.dto.response.ResponseSuccessfullyDto;
 import ayd.proyecto1.fastdelivery.exception.BusinessException;
-import ayd.proyecto1.fastdelivery.repository.crud.DeliveryOrderAssignmentCrud;
-import ayd.proyecto1.fastdelivery.repository.crud.DeliveryOrderCrud;
-import ayd.proyecto1.fastdelivery.repository.crud.DeliveryOrderStatusCrud;
-import ayd.proyecto1.fastdelivery.repository.crud.DeliveryPersonCrud;
+import ayd.proyecto1.fastdelivery.repository.crud.*;
+import ayd.proyecto1.fastdelivery.repository.entities.Contract;
 import ayd.proyecto1.fastdelivery.repository.entities.DeliveryOrder;
 import ayd.proyecto1.fastdelivery.repository.entities.DeliveryOrderAssignment;
 import ayd.proyecto1.fastdelivery.repository.entities.DeliveryPerson;
@@ -29,6 +27,8 @@ public class DeliveryOrderAssignmentService {
 
     private final DeliveryPersonCrud deliveryPersonCrud;
 
+    private final ContractCrud contractCrud;
+
     private final DeliveryOrderStatusCrud deliveryOrderStatusCrud;
 
     private final DeliveryOrderAssignmentCrud deliveryOrderAssignmentCrud;
@@ -36,6 +36,8 @@ public class DeliveryOrderAssignmentService {
     private static final Integer ORDER_CREATED_STATUS = 1;
 
     private static final Integer ORDER_ASSIGNED_STATUS = 2;
+
+    private static final Integer CONTRACT_STATUS_ACTIVE = 1;
 
     public ResponseSuccessfullyDto createDeliveryOrderAssignment(NewDeliveryOrderAssignmentDto newDeliveryOrderAssignmentDto, Boolean isRestricted){
         DeliveryOrderAssignment deliveryOrderAssignment = new DeliveryOrderAssignment();
@@ -49,6 +51,15 @@ public class DeliveryOrderAssignmentService {
         Optional<DeliveryPerson> deliveryPerson = deliveryPersonCrud.findById(newDeliveryOrderAssignmentDto.getIdDeliveryPerson());
         if(deliveryPerson.isEmpty()){
             throw new BusinessException(HttpStatus.NOT_FOUND,"El Repartidor no ha sido encontrado.");
+        }
+        //Verificar Contrato
+        Optional<Contract> contract = contractCrud.findById(deliveryPerson.get().getContract().getId());
+        //verificar enddate.
+        if(!contract.get().getStatus().getId().equals(CONTRACT_STATUS_ACTIVE)){
+            throw new BusinessException(HttpStatus.NOT_FOUND,"El Repartidor no tiene un contrato activo.");
+        }
+        if(!deliveryPerson.get().getAvailable()){
+            throw new BusinessException(HttpStatus.NOT_FOUND,"El Repartidor no está disponible.");
         }
         //Verificar estado de la orden.
         if(!deliveryOrderAssignmentCrud.getDeliveryOrderAssignmentByIdDeliveryOrder(deliveryOrder.get().getId()).isEmpty()){
@@ -74,10 +85,6 @@ public class DeliveryOrderAssignmentService {
                 throw new BusinessException(HttpStatus.NOT_FOUND,"La Orden de Entrega ya fue asignada a otro repartidor.");
             }
 
-        }
-
-        if(!deliveryPerson.get().getAvailable()){
-            throw new BusinessException(HttpStatus.NOT_FOUND,"El Repartidor no está disponible.");
         }
 
         deliveryOrderAssignment.setDeliveryOrder(deliveryOrder.get());
