@@ -18,7 +18,6 @@ public interface UserCrud extends JpaRepository<User, Integer> {
     @Query(value = "select * from user where id_role = ? ;", nativeQuery = true)
     List<User> getUserByIdRole(Integer id_role);
 
-    @Query(value = "UPDATE user SET authentication = ? WHERE id = ? ;", nativeQuery = true)
-    void updateAuthenjticationStatus(Boolean status, Integer userId);
+
 
 }

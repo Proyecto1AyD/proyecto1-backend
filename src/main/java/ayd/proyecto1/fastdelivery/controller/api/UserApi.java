@@ -46,6 +46,15 @@ public interface UserApi {
     ResponseEntity<ResponseSuccessfullyDto> updateAuthStatus(@RequestBody UpdateAuthStatusDto updateAuthStatusDto, @RequestHeader(value = "user") Integer userId);
 
 
+    @PostMapping("/forgot_password")
+    ResponseEntity<ResponseSuccessfullyDto> userForgotPassword(@RequestBody UserForgotPasswordDto userForgotPasswordDto);
+
+
+    @PostMapping("/recovery_password")
+    ResponseEntity<ResponseSuccessfullyDto> recoveryPassword(@RequestBody RecoveryPasswordDto recoveryPasswordDto,
+                                                             @RequestHeader(value = "user") Integer userId);
+
+
     //EJEMPLO
     @PostMapping("/test/{nombre}")
     ResponseEntity<ResponseSuccessfullyDto> prueba(@RequestBody LoginDto loginDto, @RequestHeader(value = "token") String token,@RequestParam("id") String id,
