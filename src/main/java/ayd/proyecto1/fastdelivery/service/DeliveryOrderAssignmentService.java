@@ -33,17 +33,24 @@ public class DeliveryOrderAssignmentService {
 
     private final DeliveryOrderAssignmentCrud deliveryOrderAssignmentCrud;
 
+    private static final Integer ORDER_CREATED_STATUS = 1;
+
+    private static final Integer ORDER_ASSIGNED_STATUS = 2;
+
     public ResponseSuccessfullyDto createDeliveryOrderAssignment(NewDeliveryOrderAssignmentDto newDeliveryOrderAssignmentDto, Boolean isRestricted){
         DeliveryOrderAssignment deliveryOrderAssignment = new DeliveryOrderAssignment();
         Optional<DeliveryOrder> deliveryOrder = deliveryOrderCrud.findById(newDeliveryOrderAssignmentDto.getIdDeliveryOrder());
         if(deliveryOrder.isEmpty()){
             throw new BusinessException(HttpStatus.NOT_FOUND,"La Orden de Entrega no ha sido encontrada.");
         }
+        if(!deliveryOrder.get().getDeliveryOrderStatus().getId().equals(ORDER_CREATED_STATUS) && !deliveryOrder.get().getDeliveryOrderStatus().getId().equals(ORDER_ASSIGNED_STATUS)){
+            throw new BusinessException(HttpStatus.UNAUTHORIZED,"No es posible actualizar la asignación a la orden de entrega, ya está en movimiento");
+        }
         Optional<DeliveryPerson> deliveryPerson = deliveryPersonCrud.findById(newDeliveryOrderAssignmentDto.getIdDeliveryPerson());
         if(deliveryPerson.isEmpty()){
             throw new BusinessException(HttpStatus.NOT_FOUND,"El Repartidor no ha sido encontrado.");
         }
-
+        //Verificar estado de la orden.
         if(!deliveryOrderAssignmentCrud.getDeliveryOrderAssignmentByIdDeliveryOrder(deliveryOrder.get().getId()).isEmpty()){
             if (!isRestricted){
                 //no repetir repartidor
@@ -81,7 +88,7 @@ public class DeliveryOrderAssignmentService {
         deliveryPerson1.setAvailable(false);
         //Actualizar estado de la Orden Entrega
         DeliveryOrder deliveryOrder1 = deliveryOrder.get();
-        deliveryOrder1.setDeliveryOrderStatus(deliveryOrderStatusCrud.findById(2).get());
+        deliveryOrder1.setDeliveryOrderStatus(deliveryOrderStatusCrud.findById(ORDER_ASSIGNED_STATUS).get());
         try{
             deliveryOrderAssignmentCrud.save(deliveryOrderAssignment);
             deliveryPersonCrud.save(deliveryPerson1);
