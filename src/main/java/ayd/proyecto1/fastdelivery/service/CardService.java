@@ -72,13 +72,13 @@ public class CardService {
             throw new BusinessException(HttpStatus.NOT_FOUND,"El usuario no ha sido encontrado");
         }
         Card card = optionalCard.get();
-        card.setTitle(card.getTitle());
-        card.setShippingPrice(card.getShippingPrice());
-        card.setDiscount(card.getDiscount());
-        card.setCancellationPayment(card.getCancellationPayment());
-        card.setFreeCancellations(card.getFreeCancellations());
-        card.setMinPackages(card.getMinPackages());
-        card.setMaxPackages(card.getMaxPackages());
+        card.setTitle(cardDto.getTitle());
+        card.setShippingPrice(cardDto.getShippingPrice());
+        card.setDiscount(cardDto.getDiscount());
+        card.setCancellationPayment(cardDto.getCancellationPayment());
+        card.setFreeCancellations(cardDto.getFreeCancellations());
+        card.setMinPackages(cardDto.getMinPackages());
+        card.setMaxPackages(cardDto.getMaxPackages());
 
         try{
             cardCrud.save(card);

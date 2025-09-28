@@ -35,13 +35,14 @@ public class UserController implements UserApi {
 
     @Override
     public ResponseEntity<ResponseSuccessfullyDto> validateToken(ValidateCodeDto validateCodeDto) {
+        log.info("GET user/code");
         ResponseSuccessfullyDto responseSuccessfullyDto = userService.validateCode(validateCodeDto);
         return new ResponseEntity<>(responseSuccessfullyDto, responseSuccessfullyDto.getCode());
     }
 
     @Override
     public ResponseEntity<ResponseSuccessfullyDto> prueba(LoginDto loginDto, String token, String id, String nombre) {
-        log.info("user/test");
+        log.info("POST user/test");
         ResponseSuccessfullyDto responseSuccessfullyDto = ResponseSuccessfullyDto
                 .builder()
                 .code(HttpStatus.OK)
