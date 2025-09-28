@@ -237,6 +237,7 @@ public class UserService {
         return ResponseSuccessfullyDto.builder()
                 .code(HttpStatus.OK)
                 .message("Se ha enviado un codigo a tu correo para la recuperación de contraseña")
+                .body(UserInfoDto.builder().userId(user.getId()).build())
                 .build();
     }
 
