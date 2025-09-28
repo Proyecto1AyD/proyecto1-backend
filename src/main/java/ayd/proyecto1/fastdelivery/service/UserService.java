@@ -1,9 +1,6 @@
 package ayd.proyecto1.fastdelivery.service;
 
-import ayd.proyecto1.fastdelivery.dto.request.LoginDto;
-import ayd.proyecto1.fastdelivery.dto.request.NewUserDto;
-import ayd.proyecto1.fastdelivery.dto.request.UpdateEntityDto;
-import ayd.proyecto1.fastdelivery.dto.request.ValidateCodeDto;
+import ayd.proyecto1.fastdelivery.dto.request.*;
 import ayd.proyecto1.fastdelivery.dto.response.*;
 import ayd.proyecto1.fastdelivery.exception.BusinessException;
 import ayd.proyecto1.fastdelivery.repository.crud.UserCrud;
@@ -223,6 +220,47 @@ public class UserService {
         }catch (Exception exception){
             throw new BusinessException(HttpStatus.BAD_REQUEST,"Error al actualizar los permisos de autenticación en 2 pasos.");
         }
+    }
+
+
+    public ResponseSuccessfullyDto userForgotPassword(UserForgotPasswordDto userForgotPasswordDto){
+
+        Optional<User> userOptional = userCrud.getUserByUsername(userForgotPasswordDto.getUsername());
+
+        if(userOptional.isEmpty()){
+            throw new BusinessException(HttpStatus.NOT_FOUND,"El usuario no ha sido encontrado");
+        }
+
+        User user = userOptional.get();
+        sendCodeToUser(user);
+
+        return ResponseSuccessfullyDto.builder()
+                .code(HttpStatus.OK)
+                .message("Se ha enviado un codigo a tu correo para la recuperación de contraseña")
+                .build();
+    }
+
+
+    public ResponseSuccessfullyDto recoveryPassword(RecoveryPasswordDto recoveryPasswordDto, Integer userId){
+
+        if(!recoveryPasswordDto.getNewPassword().equals(recoveryPasswordDto.getConfirmNewPassword())){
+            throw new BusinessException(HttpStatus.BAD_REQUEST,"La nueva contraseña y la confirmación no coinciden");
+        }
+
+        Optional<User> userOptional = userCrud.findById(userId);
+
+        if(userOptional.isEmpty()){
+            throw new BusinessException(HttpStatus.NOT_FOUND,"El usuario no ha sido encontrado");
+        }
+        String passwordHashed = utils.hashPassword(recoveryPasswordDto.getNewPassword());
+
+        User user = userOptional.get();
+        user.setPassword(passwordHashed);
+        userCrud.save(user);
+
+        return ResponseSuccessfullyDto.builder().code(HttpStatus.OK)
+                .message("La contraseña ha sido actualizada, inicie sesión nuevamente")
+                .build();
     }
 
 }
