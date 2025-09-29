@@ -3,6 +3,7 @@ package ayd.proyecto1.fastdelivery.service;
 import ayd.proyecto1.fastdelivery.dto.internal.NewReceiptDto;
 import ayd.proyecto1.fastdelivery.dto.request.NewDeliveryOrderAssignmentDto;
 import ayd.proyecto1.fastdelivery.dto.request.NewDeliveryOrderDto;
+import ayd.proyecto1.fastdelivery.dto.request.NewIncidentDto;
 import ayd.proyecto1.fastdelivery.dto.response.DeliveryOrderDto;
 import ayd.proyecto1.fastdelivery.dto.response.ResponseSuccessfullyDto;
 import ayd.proyecto1.fastdelivery.exception.BusinessException;
@@ -14,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -40,6 +42,10 @@ public class DeliveryOrderUpdatesService {
     private final DeliveryPersonCrud deliveryPersonCrud;
 
     private static final Integer ORDER_DELIVERED_STATUS = 6;
+
+    private static final Integer ORDER_RETURNING_TO_BUSINESS_STATUS = 8;
+
+    private static final Integer ORDER_RETURN_STATUS = 9;
 
     private static final Integer ORDER_PENDING_STATUS = 5;
 
@@ -102,6 +108,175 @@ public class DeliveryOrderUpdatesService {
             throw new BusinessException(HttpStatus.BAD_REQUEST, "No es posible entrega el paquete, porque no esta en el estado Pendiente de Entrega");
         }
     }
+
+    public ResponseSuccessfullyDto returnDeliveryOrder(Integer deliveryOrderId) {
+        // Verificar Orden de Entrega
+        Optional <DeliveryOrder> optionalDeliveryOrder = deliveryOrderCrud.findById(deliveryOrderId);
+        verifyIsEmpty(optionalDeliveryOrder, "Orden de Entrega");
+        DeliveryOrder deliveryOrder = optionalDeliveryOrder.get();
+        //Comercio-Tarjeta
+        //USER
+        User user = deliveryOrder.getBusiness();
+        log.info("userID:" + user.getName());
+        verifyIsEmpty(user, "Usuario");
+        //Comercio-Tarjeta
+        BusinessCard businessCard = businessCardCrud.getBusinessCardActiveByIdBusiness(user.getId());
+        verifyIsEmpty(businessCard, "Tarjeta-Comercio");
+        //TARJETA
+        Card card = businessCard.getCard();
+        verifyIsEmpty(card, "Tarjeta");
+        //Asignacion de la Orden
+        DeliveryOrderAssignment deliveryOrderAssignment = deliveryOrderAssignmentCrud.getDeliveryOrderAssignmentByIdDeliveryOrderActive(deliveryOrder.getId(), true);
+        verifyIsEmpty(deliveryOrderAssignment, "Asignación de Orden de Entrega");
+        // Verificar Repartidor
+        //REPARTIDOR
+        DeliveryPerson deliveryPerson = deliveryOrderAssignment.getDeliveryPerson();
+        verifyIsEmpty(deliveryPerson, "Repartidor");
+        //CONTRATO
+        Contract contract = deliveryPerson.getContract();
+        verifyIsEmpty(contract, "Contrato");
+
+        //VERIFICAR ESTADO DE LA ORDEN DE ENTREGAR
+        if (deliveryOrder.getDeliveryOrderStatus().getId().equals(ORDER_RETURNING_TO_BUSINESS_STATUS)){
+
+            try{
+                Double monto = 0.0;
+                if (card.getFreeCancellations()==0 || card.getFreeCancellations() < businessCard.getCancellations()){
+                    //REPARTIDOR
+                    log.info("Precio Envio de tarjeta "+card.getShippingPrice());
+                    log.info("Comision "+contract.getCommission());
+                    log.info("Porcentaje de Comisión "+(contract.getCommission().doubleValue() /100.0));
+                    log.info("Porcentaje de Comisión por Cancelacion "+(card.getCancellationPayment().doubleValue() /100.0));
+                    monto = (card.getShippingPrice() * (contract.getCommission().doubleValue() /100.0))*(card.getCancellationPayment().doubleValue() /100.0);
+                    log.info("Monto: "+monto);
+                    deliveryPerson.setWallet(deliveryPerson.getWallet()+monto);
+                }
+                //REPARTIDOR
+                deliveryPerson.setAvailable(true);
+                DeliveryPerson deliveryPerson1 = deliveryPersonCrud.save(deliveryPerson);
+                //TARJETA-COMERCIO
+                businessCard.setCancellations(businessCard.getCancellations()+1);
+                businessCardCrud.save(businessCard);
+                //ASIGNACION
+                deliveryOrderAssignment.setActive(false);
+                deliveryOrderAssignmentCrud.save(deliveryOrderAssignment);
+                //ORDEN
+                deliveryOrder.setDeliveryOrderStatus(deliveryOrderStatusCrud.findById(ORDER_RETURN_STATUS).get());
+                deliveryOrderCrud.save(deliveryOrder);
+                //RECIBO
+                if (monto!=0){
+                    LocalDate date = LocalDate.now();
+                    NewReceiptDto newReceiptDto = NewReceiptDto.builder().deliveryOrderAssignmentId(deliveryOrderAssignment.getId()).amount(monto).date(date).build();
+                    receiptService.createReceipt(newReceiptDto);
+                }
+                //Asigna al Repartidor a una nueva orden, si la hay.
+                deliveryOrderAssignmentService.autoAssignmentDeliveryPerson(deliveryPerson1);
+                return ResponseSuccessfullyDto.builder().code(HttpStatus.CREATED).message("Retorno de Paquete finalizado exitosamente.").build();
+            }catch (Exception exception){
+                throw new BusinessException(HttpStatus.BAD_REQUEST,"Error al guardar la Asignacion Orden de Entrega");
+            }
+        }else{
+            throw new BusinessException(HttpStatus.BAD_REQUEST, "No es posible entrega el paquete, porque no esta en el estado Retorno al Comercio.");
+        }
+    }
+/*
+    public ResponseSuccessfullyDto cancelDeliveryOrder(NewIncidentDto incidentDto, Boolean isBusiness) {
+/*
+        Incident incident = new Incident();
+        Optional<DeliveryOrder> deliveryOrder = deliveryOrderCrud.findById(newIncidentDto.getDeliveryOrderId());
+        verifyIsEmpty(deliveryOrder);
+        Optional<IncidentType> incidentType = incidentTypeCrud.findById(newIncidentDto.getIncidentTypeId());
+        if (incidentType.isEmpty()) {
+            throw new BusinessException(HttpStatus.BAD_REQUEST,"Tipo de Incidente no encontrado.");
+        }
+        LocalDate actualDate = LocalDate.now();
+        LocalTime actualTime = LocalTime.now();
+        incident.setDeliveryOrder(deliveryOrder.get());
+        incident.setIncidentType(incidentType.get());
+        incident.setObservations(newIncidentDto.getObservations());
+        incident.setDate(actualDate);
+        incident.setTime(actualTime);
+
+        try{
+            incidentCrud.save(incident);
+            return ResponseSuccessfullyDto.builder().code(HttpStatus.CREATED).message("Incidente creado exitosamente").build();
+        }catch (Exception exception){
+            throw new BusinessException(HttpStatus.BAD_REQUEST,"Error al guardar el Incidente");
+        }
+
+
+        // Verificar Orden de Entrega
+        Optional <DeliveryOrder> optionalDeliveryOrder = deliveryOrderCrud.findById(incidentDto.getDeliveryOrderId());
+        verifyIsEmpty(optionalDeliveryOrder, "Orden de Entrega");
+        DeliveryOrder deliveryOrder = optionalDeliveryOrder.get();
+        //Vefiricar Tipo de Incidencia
+
+
+        //Comercio-Tarjeta
+        //USER
+        User user = deliveryOrder.getBusiness();
+        log.info("userID:" + user.getName());
+        verifyIsEmpty(user, "Usuario");
+        //Comercio-Tarjeta
+        BusinessCard businessCard = businessCardCrud.getBusinessCardActiveByIdBusiness(user.getId());
+        verifyIsEmpty(businessCard, "Tarjeta-Comercio");
+        //TARJETA
+        Card card = businessCard.getCard();
+        verifyIsEmpty(card, "Tarjeta");
+        //Asignacion de la Orden
+        DeliveryOrderAssignment deliveryOrderAssignment = deliveryOrderAssignmentCrud.getDeliveryOrderAssignmentByIdDeliveryOrderActive(deliveryOrder.getId(), true);
+        verifyIsEmpty(deliveryOrderAssignment, "Asignación de Orden de Entrega");
+        // Verificar Repartidor
+        //REPARTIDOR
+        DeliveryPerson deliveryPerson = deliveryOrderAssignment.getDeliveryPerson();
+        verifyIsEmpty(deliveryPerson, "Repartidor");
+        //CONTRATO
+        Contract contract = deliveryPerson.getContract();
+        verifyIsEmpty(contract, "Contrato");
+
+        //VERIFICAR ESTADO DE LA ORDEN DE ENTREGAR
+        if (deliveryOrder.getDeliveryOrderStatus().getId().equals(ORDER_RETURNING_TO_BUSINESS_STATUS)){
+
+            try{
+                Double monto = 0.0;
+                if (card.getFreeCancellations()==0 || card.getFreeCancellations() < businessCard.getCancellations()){
+                    //REPARTIDOR
+                    log.info("Precio Envio de tarjeta "+card.getShippingPrice());
+                    log.info("Comision "+contract.getCommission());
+                    log.info("Porcentaje de Comisión "+(contract.getCommission().doubleValue() /100.0));
+                    log.info("Porcentaje de Comisión por Cancelacion "+(card.getCancellationPayment().doubleValue() /100.0));
+                    monto = (card.getShippingPrice() * (contract.getCommission().doubleValue() /100.0))*(card.getCancellationPayment().doubleValue() /100.0);
+                    log.info("Monto: "+monto);
+                    deliveryPerson.setWallet(deliveryPerson.getWallet()+monto);
+                }
+                //REPARTIDOR
+                deliveryPerson.setAvailable(true);
+                DeliveryPerson deliveryPerson1 = deliveryPersonCrud.save(deliveryPerson);
+                //TARJETA-COMERCIO
+                businessCard.setCancellations(businessCard.getCancellations()+1);
+                businessCardCrud.save(businessCard);
+                //ASIGNACION
+                deliveryOrderAssignment.setActive(false);
+                deliveryOrderAssignmentCrud.save(deliveryOrderAssignment);
+                //ORDEN
+                deliveryOrder.setDeliveryOrderStatus(deliveryOrderStatusCrud.findById(ORDER_RETURN_STATUS).get());
+                deliveryOrderCrud.save(deliveryOrder);
+                //RECIBO
+                if (monto!=0){
+                    LocalDate date = LocalDate.now();
+                    NewReceiptDto newReceiptDto = NewReceiptDto.builder().deliveryOrderAssignmentId(deliveryOrderAssignment.getId()).amount(monto).date(date).build();
+                    receiptService.createReceipt(newReceiptDto);
+                }
+                //Asigna al Repartidor a una nueva orden, si la hay.
+                deliveryOrderAssignmentService.autoAssignmentDeliveryPerson(deliveryPerson1);
+                return ResponseSuccessfullyDto.builder().code(HttpStatus.CREATED).message("Retorno de Paquete finalizado exitosamente.").build();
+            }catch (Exception exception){
+                throw new BusinessException(HttpStatus.BAD_REQUEST,"Error al guardar la Asignacion Orden de Entrega");
+            }
+        }else{
+            throw new BusinessException(HttpStatus.BAD_REQUEST, "No es posible entrega el paquete, porque no esta en el estado Retorno al Comercio.");
+        }
+    }*/
 /*
     public ResponseSuccessfullyDto createDeliveryOrder(NewDeliveryOrderDto newDeliveryOrderDto){
         DeliveryOrder deliveryOrder = new DeliveryOrder();

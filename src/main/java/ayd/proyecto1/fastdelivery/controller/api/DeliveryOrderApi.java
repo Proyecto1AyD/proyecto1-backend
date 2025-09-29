@@ -35,4 +35,7 @@ public interface DeliveryOrderApi {
 
     @PutMapping("/delivered/{id}")
     ResponseEntity<ResponseSuccessfullyDto> deliveredDeliveryOrder(@PathVariable Integer id);
+
+    @PutMapping("/return/{id}")
+    ResponseEntity<ResponseSuccessfullyDto> returnDeliveryOrder(@PathVariable Integer id);
 }
