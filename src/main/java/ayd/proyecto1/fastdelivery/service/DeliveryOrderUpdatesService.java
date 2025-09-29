@@ -1,20 +1,19 @@
 package ayd.proyecto1.fastdelivery.service;
 
+import ayd.proyecto1.fastdelivery.dto.internal.NewReceiptDto;
 import ayd.proyecto1.fastdelivery.dto.request.NewDeliveryOrderAssignmentDto;
 import ayd.proyecto1.fastdelivery.dto.request.NewDeliveryOrderDto;
 import ayd.proyecto1.fastdelivery.dto.response.DeliveryOrderDto;
 import ayd.proyecto1.fastdelivery.dto.response.ResponseSuccessfullyDto;
 import ayd.proyecto1.fastdelivery.exception.BusinessException;
-import ayd.proyecto1.fastdelivery.repository.crud.DeliveryOrderCrud;
-import ayd.proyecto1.fastdelivery.repository.entities.DeliveryOrder;
-import ayd.proyecto1.fastdelivery.repository.entities.DeliveryOrderAssignment;
-import ayd.proyecto1.fastdelivery.repository.entities.DeliveryPerson;
-import ayd.proyecto1.fastdelivery.repository.entities.User;
+import ayd.proyecto1.fastdelivery.repository.crud.*;
+import ayd.proyecto1.fastdelivery.repository.entities.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -22,22 +21,88 @@ import java.util.Optional;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class DeliveryOrderService {
+public class DeliveryOrderUpdatesService {
+
+    private final UserCrud userCrud;
 
     private final DeliveryOrderCrud deliveryOrderCrud;
 
-    private final UserService userService;
+    private final DeliveryOrderStatusCrud deliveryOrderStatusCrud;
 
-    private final DeliveryOrderStatusService deliveryOrderStatusService;
+    private final ReceiptService receiptService;
+
+    private final DeliveryOrderAssignmentCrud deliveryOrderAssignmentCrud;
 
     private final DeliveryOrderAssignmentService deliveryOrderAssignmentService;
 
-    private final BusinessCardService businessCardService;
+    private final BusinessCardCrud businessCardCrud;
 
-    private static final Integer ORDER_CREATED_STATUS = 1;
+    private final DeliveryPersonCrud deliveryPersonCrud;
 
-    private static final Integer ORDER_ASSIGNED_STATUS = 2;
+    private static final Integer ORDER_DELIVERED_STATUS = 6;
 
+    private static final Integer ORDER_PENDING_STATUS = 5;
+
+    public ResponseSuccessfullyDto deliveredDeliveryOrder(Integer deliveryOrderId) {
+        // Verificar Orden de Entrega
+        Optional <DeliveryOrder> optionalDeliveryOrder = deliveryOrderCrud.findById(deliveryOrderId);
+        verifyIsEmpty(optionalDeliveryOrder, "Orden de Entrega");
+        DeliveryOrder deliveryOrder = optionalDeliveryOrder.get();
+        //Comercio-Tarjeta
+            //USER
+        User user = deliveryOrder.getBusiness();
+        log.info("userID:" + user.getName());
+        verifyIsEmpty(user, "Usuario");
+            //Comercio-Tarjeta
+        BusinessCard businessCard = businessCardCrud.getBusinessCardActiveByIdBusiness(user.getId());
+        verifyIsEmpty(businessCard, "Tarjeta-Comercio");
+            //TARJETA
+        Card card = businessCard.getCard();
+        verifyIsEmpty(card, "Tarjeta");
+        //Asignacion de la Orden
+        DeliveryOrderAssignment deliveryOrderAssignment = deliveryOrderAssignmentCrud.getDeliveryOrderAssignmentByIdDeliveryOrderActive(deliveryOrder.getId(), true);
+        verifyIsEmpty(deliveryOrderAssignment, "Asignación de Orden de Entrega");
+        // Verificar Repartidor
+            //REPARTIDOR
+        DeliveryPerson deliveryPerson = deliveryOrderAssignment.getDeliveryPerson();
+        log.info("userID:", deliveryPerson.getId(), "wallet:", deliveryPerson.getWallet());
+        verifyIsEmpty(deliveryPerson, "Repartidor");
+            //CONTRATO
+        Contract contract = deliveryPerson.getContract();
+        verifyIsEmpty(contract, "Contrato");
+
+        //VERIFICAR ESTADO DE LA ORDEN DE ENTREGAR
+        if (deliveryOrder.getDeliveryOrderStatus().getId().equals(ORDER_PENDING_STATUS)){
+
+            try{
+                //REPARTIDOR
+                log.info("Precio Envio de tarjeta "+card.getShippingPrice());
+                log.info("Comision "+contract.getCommission());
+                log.info("Porcentaje de Comisión "+(contract.getCommission().doubleValue() /100.0));
+                Double monto = card.getShippingPrice() * (contract.getCommission().doubleValue() /100.0);
+                deliveryPerson.setWallet(deliveryPerson.getWallet()+monto);
+                deliveryPerson.setAvailable(true);
+                DeliveryPerson deliveryPerson1 = deliveryPersonCrud.save(deliveryPerson);
+                //ASIGNACION
+                deliveryOrderAssignment.setActive(false);
+                deliveryOrderAssignmentCrud.save(deliveryOrderAssignment);
+                //ORDEN
+                deliveryOrder.setDeliveryOrderStatus(deliveryOrderStatusCrud.findById(ORDER_DELIVERED_STATUS).get());
+                deliveryOrderCrud.save(deliveryOrder);
+                //RECIBO
+                LocalDate date = LocalDate.now();
+                NewReceiptDto newReceiptDto = NewReceiptDto.builder().deliveryOrderAssignmentId(deliveryOrderAssignment.getId()).amount(monto).date(date).build();
+                receiptService.createReceipt(newReceiptDto);
+                deliveryOrderAssignmentService.autoAssignmentDeliveryPerson(deliveryPerson1);
+                return ResponseSuccessfullyDto.builder().code(HttpStatus.CREATED).message("Entrega finalizada exitosamente.").build();
+            }catch (Exception exception){
+                throw new BusinessException(HttpStatus.BAD_REQUEST,"Error al guardar la Asignacion Orden de Entrega");
+            }
+        }else{
+            throw new BusinessException(HttpStatus.BAD_REQUEST, "No es posible entrega el paquete, porque no esta en el estado Pendiente de Entrega");
+        }
+    }
+/*
     public ResponseSuccessfullyDto createDeliveryOrder(NewDeliveryOrderDto newDeliveryOrderDto){
         DeliveryOrder deliveryOrder = new DeliveryOrder();
         deliveryOrder.setBusiness(userService.getById(newDeliveryOrderDto.getIdBusiness()));
@@ -51,7 +116,6 @@ public class DeliveryOrderService {
             DeliveryOrder deliveryOrderSaved = deliveryOrderCrud.save(deliveryOrder);
             String messageResponse = "Orden de Entrega creada exitosamente";
             try {
-                businessCardService.validateNewCard(deliveryOrderSaved.getBusiness().getId());
                 deliveryOrderAssignmentService.autoAssignmentDeliveryOrder(deliveryOrderSaved);
             } catch (Exception exception) {
                 log.warn(exception.getMessage());
@@ -168,5 +232,16 @@ public class DeliveryOrderService {
             throw new BusinessException(HttpStatus.UNAUTHORIZED,"No es posible actualizar la orden, ya está en movimiento");
         }
     }
+*/
+    private void verifyIsEmpty(Optional optional, String objeto) {
+        if(optional.isEmpty()){
+            throw new BusinessException(HttpStatus.NOT_FOUND,"El registro de "+objeto+" no ha sido encontrado.");
+        }
+    }
 
+    private void verifyIsEmpty(Object optional, String objeto) {
+        if(optional == null){
+            throw new BusinessException(HttpStatus.NOT_FOUND,"El registro de "+objeto+" no ha sido encontrado.");
+        }
+    }
 }

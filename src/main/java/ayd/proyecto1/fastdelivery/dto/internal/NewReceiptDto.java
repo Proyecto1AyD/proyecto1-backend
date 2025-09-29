@@ -1,4 +1,4 @@
-package ayd.proyecto1.fastdelivery.dto.response;
+package ayd.proyecto1.fastdelivery.dto.internal;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -10,14 +10,11 @@ import java.util.Date;
 @Getter
 @Setter
 @Builder
-public class ReceiptInfoDto {
-
-    private Integer receiptId;
+public class NewReceiptDto {
 
     private Integer deliveryOrderAssignmentId;
 
     private Double amount;
 
     private LocalDate date;
-
 }

@@ -179,6 +179,23 @@ public class EmployeeService {
         return ResponseSuccessfullyDto.builder().code(HttpStatus.OK).message("Repartidor encontrado").body(deliveryPersonInfoDto).build();
     }
 
+    public ResponseSuccessfullyDto getDeliveryPersonInfoByAvailable(Boolean available){
+
+        List<DeliveryPerson> deliveryPersonList = deliveryPersonCrud.getByAvailable(available);
+        List<DeliveryPersonInfoDto> deliveryPersonInfoDtoList = new ArrayList<>();
+
+        deliveryPersonList.forEach(deliveryPerson -> {
+            DeliveryPersonInfoDto deliveryPersonInfoDto = DeliveryPersonInfoDto.builder()
+                    .id(deliveryPerson.getId()).wallet(deliveryPerson.getWallet())
+                    .userId(deliveryPerson.getUser().getId()).branchId(deliveryPerson.getBranch().getId())
+                    .contractId(deliveryPerson.getContract().getId())
+                    .available(deliveryPerson.getAvailable()).build();
+            deliveryPersonInfoDtoList.add(deliveryPersonInfoDto);
+        });
+
+        return ResponseSuccessfullyDto.builder().code(HttpStatus.OK).body(deliveryPersonInfoDtoList).build();
+    }
+
     public Coordinator getCoordinatorById(Integer id){
 
         Optional<Coordinator> optionalCoordinator = coordinatorCrud.findById(id);

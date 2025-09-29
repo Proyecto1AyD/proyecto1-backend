@@ -71,6 +71,13 @@ public class EmployeeController implements EmployeeApi {
         ResponseSuccessfullyDto responseSuccessfullyDto = employeeService.getDeliveryPersonInfoById(deliveryPersonId);
         return new ResponseEntity<>(responseSuccessfullyDto,responseSuccessfullyDto.getCode());
     }
+    @Override
+    public ResponseEntity<ResponseSuccessfullyDto> getDeliveryPersonByAvailable(Boolean available, Integer token) {
+        log.info("GET user/delivery/available/{available}");
+        userService.validateAuthorizationHeader(token);
+        ResponseSuccessfullyDto responseSuccessfullyDto = employeeService.getDeliveryPersonInfoByAvailable(available);
+        return new ResponseEntity<>(responseSuccessfullyDto,responseSuccessfullyDto.getCode());
+    }
 
     @Override
     public ResponseEntity<ResponseSuccessfullyDto> getAllDeliveryPerson(Integer token) {

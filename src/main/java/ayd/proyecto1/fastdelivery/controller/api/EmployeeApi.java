@@ -37,6 +37,10 @@ public interface EmployeeApi {
     ResponseEntity<ResponseSuccessfullyDto> getDeliveryPerson(@PathVariable(value = "id") Integer deliveryPersonId,
                                                            @RequestHeader(value = "authorization") Integer token);
 
+    @GetMapping("/delivery/available/{available}")
+    ResponseEntity<ResponseSuccessfullyDto> getDeliveryPersonByAvailable(@PathVariable(value = "available") Boolean available,
+                                                              @RequestHeader(value = "authorization") Integer token);
+
     @GetMapping("/delivery/all")
     ResponseEntity<ResponseSuccessfullyDto> getAllDeliveryPerson(@RequestHeader(value = "authorization") Integer token);
 
