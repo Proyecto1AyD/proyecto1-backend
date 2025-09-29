@@ -204,7 +204,6 @@ public class DeliveryOrderUpdatesService {
             throw new BusinessException(HttpStatus.BAD_REQUEST,"Error al guardar el Incidente");
         }
 
-
         // Verificar Orden de Entrega
         Optional <DeliveryOrder> optionalDeliveryOrder = deliveryOrderCrud.findById(incidentDto.getDeliveryOrderId());
         verifyIsEmpty(optionalDeliveryOrder, "Orden de Entrega");

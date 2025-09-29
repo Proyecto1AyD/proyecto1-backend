@@ -32,6 +32,8 @@ public class IncidentService {
 
     private final IncidentTypeCrud incidentTypeCrud;
 
+    private static final Integer INCIDENT_CANCEL_COSTUMER = 9;
+
     public ResponseSuccessfullyDto createIncident(NewIncidentDto newIncidentDto){
         Incident incident = new Incident();
         Optional<DeliveryOrder> deliveryOrder = deliveryOrderCrud.findById(newIncidentDto.getDeliveryOrderId());

@@ -38,6 +38,8 @@ public class DeliveryOrderService {
 
     private static final Integer ORDER_ASSIGNED_STATUS = 2;
 
+    private static final Integer ORDER_CANCELED_STATUS = 7;
+
     public ResponseSuccessfullyDto createDeliveryOrder(NewDeliveryOrderDto newDeliveryOrderDto){
         DeliveryOrder deliveryOrder = new DeliveryOrder();
         deliveryOrder.setBusiness(userService.getById(newDeliveryOrderDto.getIdBusiness()));
@@ -121,7 +123,6 @@ public class DeliveryOrderService {
         deliveryOrder.setTime(deliveryOrderDto.getTime());
         deliveryOrder.setDeliveryOrderStatus(deliveryOrderStatusService.getDeliveryOrderStatusByIdDeliveryOrderStatus(deliveryOrderDto.getIdDeliveryOrderStatus()));
         deliveryOrder.setDescription(deliveryOrderDto.getDescription());
-
         try{
             deliveryOrderCrud.save(deliveryOrder);
             log.info("Orden de Entrega actualizada...");
