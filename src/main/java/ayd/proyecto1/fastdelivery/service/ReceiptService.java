@@ -1,9 +1,12 @@
 package ayd.proyecto1.fastdelivery.service;
 
+import ayd.proyecto1.fastdelivery.dto.internal.NewReceiptDto;
 import ayd.proyecto1.fastdelivery.dto.response.ReceiptInfoDto;
 import ayd.proyecto1.fastdelivery.dto.response.ResponseSuccessfullyDto;
 import ayd.proyecto1.fastdelivery.exception.BusinessException;
+import ayd.proyecto1.fastdelivery.repository.crud.DeliveryOrderAssignmentCrud;
 import ayd.proyecto1.fastdelivery.repository.crud.ReceiptCrud;
+import ayd.proyecto1.fastdelivery.repository.entities.DeliveryOrderAssignment;
 import ayd.proyecto1.fastdelivery.repository.entities.Receipt;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +25,10 @@ public class ReceiptService {
 
 
     private final ReceiptCrud receiptCrud;
+
+    private final DeliveryOrderAssignmentCrud deliveryOrderAssignmentCrud;
+
+
 
     public ResponseSuccessfullyDto getAllReceipt(){
 
@@ -110,5 +117,27 @@ public class ReceiptService {
 
         return ResponseSuccessfullyDto.builder().code(HttpStatus.OK).body(receiptInfoDtoList).build();
     }
+
+    public void createReceipt(NewReceiptDto newReceiptDto){
+
+        Optional<DeliveryOrderAssignment> optionalDeliveryOrderAssignment = deliveryOrderAssignmentCrud.findById(newReceiptDto.getDeliveryOrderAssignmentId());
+
+        if(optionalDeliveryOrderAssignment.isEmpty()){
+            throw new BusinessException(HttpStatus.NOT_FOUND,"Error al buscar la orden de entrega");
+        }
+
+        DeliveryOrderAssignment deliveryOrderAssignment = optionalDeliveryOrderAssignment.get();
+
+        Receipt receipt = new Receipt();
+        receipt.setAmount(newReceiptDto.getAmount());
+        receipt.setDate(newReceiptDto.getDate());
+        receipt.setDeliveryOrderAssignment(deliveryOrderAssignment);
+        try{
+            receiptCrud.save(receipt);
+        }catch (Exception exception){
+            throw new BusinessException(HttpStatus.BAD_REQUEST,"Error al guardar el recibo");
+        }
+    }
+
 
 }
