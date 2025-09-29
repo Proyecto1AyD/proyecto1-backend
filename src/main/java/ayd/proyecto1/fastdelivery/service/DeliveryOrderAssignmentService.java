@@ -216,11 +216,11 @@ public class DeliveryOrderAssignmentService {
                 if (activeAssignment != null) {
                     DeliveryPerson prevDeliveryPerson = deliveryPersonCrud.findById(activeAssignment.getDeliveryPerson().getId()).orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND,"El repartidor de la asignación activa no existe."));
                     prevDeliveryPerson.setAvailable(true);
-                    //ASIGNAR AUTOMATICAMENTE A OTRA ORDEN
                     activeAssignment.setActive(false);
                     try {
                         deliveryOrderAssignmentCrud.save(activeAssignment);
-                        deliveryPersonCrud.save(prevDeliveryPerson);
+                        DeliveryPerson deliveryPerson1 = deliveryPersonCrud.save(prevDeliveryPerson);
+                        autoAssignmentDeliveryPerson(deliveryPerson1);
                         log.info("Repartidor con ID: " + prevDeliveryPerson.getId() + " fue desocupado.");
                         log.info("Asignacion Orden de Entrega con Id: " + activeAssignment.getId() + " fue desactivado.");
                     } catch (Exception exception) {
@@ -260,33 +260,28 @@ public class DeliveryOrderAssignmentService {
             throw new BusinessException(HttpStatus.BAD_REQUEST, "No hay repartidores disponibles en este momento, asignaremos su orden lo más pronto posible.");
         }
     }
-/*
+
     public void autoAssignmentDeliveryPerson(DeliveryPerson deliveryPerson) {
         // Repartidores disponibles por prioridad
-        List<DeliveryPerson> deliveryPersonList = deliveryOrderAssignmentCrud.getDeliveryPersonByPriority();
-        if (!deliveryPersonList.isEmpty()){
-            for (DeliveryPerson deliveryPerson : deliveryPersonList) {
-                NewDeliveryOrderAssignmentDto newDeliveryOrderAssignmentDto = NewDeliveryOrderAssignmentDto.builder()
-                        .idDeliveryOrder(deliveryOrder.getId())
-                        .idDeliveryPerson(deliveryPerson.getId())
-                        .build();
+        List<DeliveryOrder> deliveryOrderList = deliveryOrderCrud.getDeliveriesOrdersByIdDeliveryOrderStatus(ORDER_CREATED_STATUS);
+        if (!deliveryOrderList.isEmpty()){
+            NewDeliveryOrderAssignmentDto newDeliveryOrderAssignmentDto = NewDeliveryOrderAssignmentDto.builder()
+                    .idDeliveryOrder(deliveryOrderList.getFirst().getId())
+                    .idDeliveryPerson(deliveryPerson.getId())
+                    .build();
+            try {
+                // Intentamos crear la asignación
+                createDeliveryOrderAssignment(newDeliveryOrderAssignmentDto, true);
+                // Si llegamos aquí, se creó correctamente → salir del bucle
+                log.info("Asignación automática creada con éxito para repartidor {}", deliveryPerson.getId());
 
-                try {
-                    // Intentamos crear la asignación
-                    createDeliveryOrderAssignment(newDeliveryOrderAssignmentDto, true);
-
-                    // Si llegamos aquí, se creó correctamente → salir del bucle
-                    log.info("Asignación automática creada con éxito para repartidor {}", deliveryPerson.getId());
-                    break;
-
-                } catch (Exception exception) {
-                    // Si falla con este repartidor, seguimos con el siguiente
-                    log.warn("Error al asignar con repartidor {}: {}", deliveryPerson.getId(), exception.getMessage());
-                }
+            } catch (Exception exception) {
+                // Si falla con este repartidor, seguimos con el siguiente
+                log.warn("Error al asignar con repartidor {}: {}", deliveryPerson.getId(), exception.getMessage());
             }
         }else{
-            throw new BusinessException(HttpStatus.BAD_REQUEST, "No hay repartidores disponibles en este momento, asignaremos su orden lo más pronto posible.");
+            throw new BusinessException(HttpStatus.NOT_FOUND, "No hay Ordenes de Entrega en Cola, asignaremos una nueva orden lo más pronto posible.");
         }
     }
-*/
+
 }
