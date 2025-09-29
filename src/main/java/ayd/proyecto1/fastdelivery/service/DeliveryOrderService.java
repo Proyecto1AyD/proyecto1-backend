@@ -76,6 +76,17 @@ public class DeliveryOrderService {
         return ResponseSuccessfullyDto.builder().code(HttpStatus.OK).body(deliveryOrderDtos).build();
     }
 
+    public ResponseSuccessfullyDto getDeliveryOrderByIdDeliveryOrderStatus(Integer idDeliveryOrderStatus){
+        List<DeliveryOrder> deliveryOrderList = deliveryOrderCrud.getDeliveriesOrdersByIdDeliveryOrderStatus(idDeliveryOrderStatus);
+        ArrayList<DeliveryOrderDto> deliveryOrderDtos = new ArrayList<>();
+
+        deliveryOrderList.forEach(deliveryOrder1 -> {
+            DeliveryOrderDto deliveryOrderDto = DeliveryOrderDto.builder().id(deliveryOrder1.getId()).idBusiness((deliveryOrder1.getBusiness().getId())).recipient(deliveryOrder1.getRecipient()).address(deliveryOrder1.getAddress()).date(deliveryOrder1.getDate()).time(deliveryOrder1.getTime()).idDeliveryOrderStatus(deliveryOrder1.getDeliveryOrderStatus().getId()).description(deliveryOrder1.getDescription()).build();
+            deliveryOrderDtos.add(deliveryOrderDto);
+        });
+        return ResponseSuccessfullyDto.builder().code(HttpStatus.OK).body(deliveryOrderDtos).build();
+    }
+
     public ResponseSuccessfullyDto getAllDeliveryOrder(){
         List<DeliveryOrder> deliveryOrderList = deliveryOrderCrud.findAll();
         ArrayList<DeliveryOrderDto> deliveryOrderDtos = new ArrayList<>();

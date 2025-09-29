@@ -12,4 +12,7 @@ import java.util.List;
 public interface DeliveryOrderCrud extends JpaRepository<DeliveryOrder, Integer> {
     @Query(value = "select * from delivery_order where id_business = ?", nativeQuery = true)
     List<DeliveryOrder> getDeliveriesOrdersByIdBusiness(Integer id_business);
+
+    @Query(value = "select * from delivery_order where id_delivery_order_status = ?", nativeQuery = true)
+    List<DeliveryOrder> getDeliveriesOrdersByIdDeliveryOrderStatus(Integer id_delivery_order_status);
 }

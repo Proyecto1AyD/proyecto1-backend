@@ -39,6 +39,13 @@ public class DeliveryOrderController implements DeliveryOrderApi {
     }
 
     @Override
+    public ResponseEntity<ResponseSuccessfullyDto> getDeliveryOrderByIdDeliveryOrderStatus(Integer idDeliveryOrderStatus) {
+        log.info("GET deliveryOrder/deliveryOrderStatus/{}", idDeliveryOrderStatus);
+        ResponseSuccessfullyDto response = deliveryOrderService.getDeliveryOrderByIdDeliveryOrderStatus(idDeliveryOrderStatus);
+        return ResponseEntity.status(response.getCode()).body(response);
+    }
+
+    @Override
     public ResponseEntity<ResponseSuccessfullyDto> getAllDeliveryOrder() {
         log.info("GET deliveryOrder/all");
         ResponseSuccessfullyDto response = deliveryOrderService.getAllDeliveryOrder();
