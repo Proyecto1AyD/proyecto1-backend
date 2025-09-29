@@ -32,4 +32,7 @@ public interface DeliveryOrderApi {
 
     @DeleteMapping("{id}")
     ResponseEntity<ResponseSuccessfullyDto> deleteDeliveryOrder(@PathVariable Integer id);
+
+    @PutMapping("/delivered/{id}")
+    ResponseEntity<ResponseSuccessfullyDto> deliveredDeliveryOrder(@PathVariable Integer id);
 }
