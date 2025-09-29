@@ -18,6 +18,9 @@ public interface DeliveryOrderApi {
     @GetMapping("/business/{idBusiness}")
     ResponseEntity<ResponseSuccessfullyDto> getDeliveryOrderByIdBusiness(@PathVariable Integer idBusiness);
 
+    @GetMapping("/deliveryOrderStatus/{idDeliveryOrderStatus}")
+    ResponseEntity<ResponseSuccessfullyDto> getDeliveryOrderByIdDeliveryOrderStatus(@PathVariable Integer idDeliveryOrderStatus);
+
     @GetMapping("/all")
     ResponseEntity<ResponseSuccessfullyDto> getAllDeliveryOrder();
 
