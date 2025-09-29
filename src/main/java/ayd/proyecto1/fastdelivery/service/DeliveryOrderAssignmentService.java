@@ -170,6 +170,10 @@ public class DeliveryOrderAssignmentService {
         Optional<Contract> optionalContract = contractCrud.findById(deliveryPerson.getContract().getId());
         verifyIsEmpty(optionalContract, "Contrato");
         Contract contract = optionalContract.get();
+        //Verificar Disponibilidad del Repartidor
+        if(!deliveryPerson.getAvailable()){
+            throw new BusinessException(HttpStatus.NOT_FOUND,"El Repartidor no está disponible.");
+        }
         //Verificar End Date.
         if (contract.getEndDate()!= null){
             LocalDate fechaInicio = contract.getStartDate();
@@ -188,10 +192,6 @@ public class DeliveryOrderAssignmentService {
         //Verificar estado del contrato
         if(!contract.getStatus().getId().equals(CONTRACT_STATUS_ACTIVE)){
             throw new BusinessException(HttpStatus.NOT_FOUND,"El Repartidor no tiene un Contrato Activo.");
-        }
-        //Verificar Disponibilidad del Repartidor
-        if(!deliveryPerson.getAvailable()){
-            throw new BusinessException(HttpStatus.NOT_FOUND,"El Repartidor no está disponible.");
         }
     }
 
