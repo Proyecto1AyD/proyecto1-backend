@@ -5,15 +5,13 @@ import ayd.proyecto1.fastdelivery.dto.response.DeliveryOrderAssignmentDto;
 import ayd.proyecto1.fastdelivery.dto.response.ResponseSuccessfullyDto;
 import ayd.proyecto1.fastdelivery.exception.BusinessException;
 import ayd.proyecto1.fastdelivery.repository.crud.*;
-import ayd.proyecto1.fastdelivery.repository.entities.Contract;
-import ayd.proyecto1.fastdelivery.repository.entities.DeliveryOrder;
-import ayd.proyecto1.fastdelivery.repository.entities.DeliveryOrderAssignment;
-import ayd.proyecto1.fastdelivery.repository.entities.DeliveryPerson;
+import ayd.proyecto1.fastdelivery.repository.entities.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -29,6 +27,8 @@ public class DeliveryOrderAssignmentService {
 
     private final ContractCrud contractCrud;
 
+    private final ContractStatusCrud contractStatusCrud;
+
     private final DeliveryOrderStatusCrud deliveryOrderStatusCrud;
 
     private final DeliveryOrderAssignmentCrud deliveryOrderAssignmentCrud;
@@ -39,67 +39,36 @@ public class DeliveryOrderAssignmentService {
 
     private static final Integer CONTRACT_STATUS_ACTIVE = 1;
 
+    private static final Integer CONTRACT_STATUS_DEFEATED = 2;
+
     public ResponseSuccessfullyDto createDeliveryOrderAssignment(NewDeliveryOrderAssignmentDto newDeliveryOrderAssignmentDto, Boolean isRestricted){
         DeliveryOrderAssignment deliveryOrderAssignment = new DeliveryOrderAssignment();
         Optional<DeliveryOrder> deliveryOrder = deliveryOrderCrud.findById(newDeliveryOrderAssignmentDto.getIdDeliveryOrder());
-        if(deliveryOrder.isEmpty()){
-            throw new BusinessException(HttpStatus.NOT_FOUND,"La Orden de Entrega no ha sido encontrada.");
-        }
-        if(!deliveryOrder.get().getDeliveryOrderStatus().getId().equals(ORDER_CREATED_STATUS) && !deliveryOrder.get().getDeliveryOrderStatus().getId().equals(ORDER_ASSIGNED_STATUS)){
-            throw new BusinessException(HttpStatus.UNAUTHORIZED,"No es posible actualizar la asignación a la orden de entrega, ya está en movimiento");
-        }
         Optional<DeliveryPerson> deliveryPerson = deliveryPersonCrud.findById(newDeliveryOrderAssignmentDto.getIdDeliveryPerson());
-        if(deliveryPerson.isEmpty()){
-            throw new BusinessException(HttpStatus.NOT_FOUND,"El Repartidor no ha sido encontrado.");
-        }
-        //Verificar Contrato
-        Optional<Contract> contract = contractCrud.findById(deliveryPerson.get().getContract().getId());
-        //verificar enddate.
-        if(!contract.get().getStatus().getId().equals(CONTRACT_STATUS_ACTIVE)){
-            throw new BusinessException(HttpStatus.NOT_FOUND,"El Repartidor no tiene un contrato activo.");
-        }
-        if(!deliveryPerson.get().getAvailable()){
-            throw new BusinessException(HttpStatus.NOT_FOUND,"El Repartidor no está disponible.");
-        }
-        //Verificar estado de la orden.
-        if(!deliveryOrderAssignmentCrud.getDeliveryOrderAssignmentByIdDeliveryOrder(deliveryOrder.get().getId()).isEmpty()){
-            if (!isRestricted){
-                //no repetir repartidor
-                if(deliveryOrderAssignmentCrud.getDeliveryOrderAssignmentByIdDeliveryOrderIdDeliveryPerson(deliveryOrder.get().getId(), deliveryPerson.get().getId()) != null){
-                    throw new BusinessException(HttpStatus.NOT_FOUND,"El Repartidor ya ha sido asignado a la orden.");
-                }
-                //si hay un activo, desactivarlo.
-                DeliveryOrderAssignment deliveryOrderAssignment1 = deliveryOrderAssignmentCrud.getDeliveryOrderAssignmentByIdDeliveryOrderActive(deliveryOrder.get().getId(), true);
-                DeliveryPerson deliveryPerson1 = deliveryPersonCrud.findById(deliveryOrderAssignment1.getDeliveryPerson().getId()).get();
-                deliveryPerson1.setAvailable(true);
-                deliveryOrderAssignment1.setActive(false);
-                try{
-                    deliveryOrderAssignmentCrud.save(deliveryOrderAssignment1);
-                    deliveryPersonCrud.save(deliveryPerson1);
-                    log.info("Repartidor con ID: "+deliveryPerson1.getId()+" fue desocupado.");
-                    log.info("Asignacion Orden de Entrega con Id: "+deliveryOrderAssignment1.getId()+" fue desactivado.");
-                }catch (Exception exception){
-                    throw new BusinessException(HttpStatus.BAD_REQUEST,"Error al actualizar un Asignacion Orden de Entrega");
-                }
-            }else{
-                throw new BusinessException(HttpStatus.NOT_FOUND,"La Orden de Entrega ya fue asignada a otro repartidor.");
-            }
+        //Verificamos Valores Nulos
+        verifyIsEmpty(deliveryOrder, "Orden de Entrega");
+        verifyIsEmpty(deliveryPerson, "Repartidor");
 
-        }
-
-        deliveryOrderAssignment.setDeliveryOrder(deliveryOrder.get());
-        deliveryOrderAssignment.setDeliveryPerson(deliveryPerson.get());
-        deliveryOrderAssignment.setActive(true);
-        //Actualizar estado del Repartidor
         DeliveryPerson deliveryPerson1 = deliveryPerson.get();
-        deliveryPerson1.setAvailable(false);
-        //Actualizar estado de la Orden Entrega
         DeliveryOrder deliveryOrder1 = deliveryOrder.get();
-        deliveryOrder1.setDeliveryOrderStatus(deliveryOrderStatusCrud.findById(ORDER_ASSIGNED_STATUS).get());
+
+        //Validaciones del Repartidor
+        verifyDeliveryPerson(deliveryPerson1);
+        //Validaciones de la Orden de Entrega
+        verifyDeliveryOrder(deliveryOrder1, deliveryPerson1, isRestricted);
+
         try{
-            deliveryOrderAssignmentCrud.save(deliveryOrderAssignment);
+            //Actualizar estado del Repartidor
+            deliveryPerson1.setAvailable(false);
             deliveryPersonCrud.save(deliveryPerson1);
+            //Actualizar estado de la Orden Entrega
+            deliveryOrder1.setDeliveryOrderStatus(deliveryOrderStatusCrud.findById(ORDER_ASSIGNED_STATUS).get());
             deliveryOrderCrud.save(deliveryOrder1);
+            //Set Datos de Asignación
+            deliveryOrderAssignment.setDeliveryOrder(deliveryOrder1);
+            deliveryOrderAssignment.setDeliveryPerson(deliveryPerson1);
+            deliveryOrderAssignment.setActive(true);
+            deliveryOrderAssignmentCrud.save(deliveryOrderAssignment);
             log.info("Orden con ID: "+deliveryOrder1.getId()+", su estado fue cambiado.");
             log.info("Repartidor con ID: "+deliveryPerson1.getId()+" fue ocupado.");
             return ResponseSuccessfullyDto.builder().code(HttpStatus.CREATED).message("Asignacion Orden de Entrega creada exitosamente").build();
@@ -183,4 +152,141 @@ public class DeliveryOrderAssignmentService {
         }
     }
 
+    private boolean isTodayWithinRange(LocalDate fechaInicio, LocalDate fechaFin) {
+        LocalDate hoy = LocalDate.now();
+
+        return (hoy.isEqual(fechaInicio) || hoy.isAfter(fechaInicio)) &&
+                (hoy.isEqual(fechaFin) || hoy.isBefore(fechaFin));
+    }
+
+    private void verifyIsEmpty(Optional optional, String objeto) {
+        if(optional.isEmpty()){
+            throw new BusinessException(HttpStatus.NOT_FOUND,"El registro de "+objeto+" no ha sido encontrado.");
+        }
+    }
+
+    private void verifyDeliveryPerson(DeliveryPerson deliveryPerson) {
+        //Verificar Contrato
+        Optional<Contract> optionalContract = contractCrud.findById(deliveryPerson.getContract().getId());
+        verifyIsEmpty(optionalContract, "Contrato");
+        Contract contract = optionalContract.get();
+        //Verificar End Date.
+        if (contract.getEndDate()!= null){
+            LocalDate fechaInicio = contract.getStartDate();
+            LocalDate fechaFin = contract.getEndDate();
+            if (!isTodayWithinRange(fechaInicio,fechaFin)){
+                contract.setStatus(contractStatusCrud.findById(CONTRACT_STATUS_DEFEATED).get());
+                try{
+                    contractCrud.save(contract);
+                    log.info("Contrato actualizado a Vencido por verificación...");
+                }catch (Exception exception){
+                    throw new BusinessException(HttpStatus.BAD_REQUEST,"Error al actualizar un Contrato.");
+                }
+                throw new BusinessException(HttpStatus.NOT_FOUND,"Error al actualizar el estado del contrato.");
+            }
+        }
+        //Verificar estado del contrato
+        if(!contract.getStatus().getId().equals(CONTRACT_STATUS_ACTIVE)){
+            throw new BusinessException(HttpStatus.NOT_FOUND,"El Repartidor no tiene un Contrato Activo.");
+        }
+        //Verificar Disponibilidad del Repartidor
+        if(!deliveryPerson.getAvailable()){
+            throw new BusinessException(HttpStatus.NOT_FOUND,"El Repartidor no está disponible.");
+        }
+    }
+
+    private void verifyDeliveryOrder(DeliveryOrder deliveryOrder, DeliveryPerson deliveryPerson, Boolean isRestricted) {
+        //Verificar Estado de la Orden de Entrega
+        Integer idDeliveryOrderStatus = deliveryOrder.getDeliveryOrderStatus().getId();
+        if(!idDeliveryOrderStatus.equals(ORDER_CREATED_STATUS) && !idDeliveryOrderStatus.equals(ORDER_ASSIGNED_STATUS)){
+            throw new BusinessException(HttpStatus.UNAUTHORIZED,"No es posible actualizar la asignación a la orden de entrega, ya está en movimiento.");
+        }
+
+        //Verificar Asignaciones de la Orden de Entrega.
+        List<DeliveryOrderAssignment> deliveryOrderAssignments = deliveryOrderAssignmentCrud.getDeliveryOrderAssignmentByIdDeliveryOrder(deliveryOrder.getId());
+        if(!deliveryOrderAssignments.isEmpty()){
+            if (!isRestricted){
+                //Verifica que no se repita el repartidor
+                if(deliveryOrderAssignmentCrud.getDeliveryOrderAssignmentByIdDeliveryOrderIdDeliveryPerson(deliveryOrder.getId(), deliveryPerson.getId()) != null){
+                    throw new BusinessException(HttpStatus.NOT_FOUND,"El Repartidor ya ha sido asignado a la orden.");
+                }
+                //si hay un activo, desactivarlo.
+                DeliveryOrderAssignment activeAssignment = deliveryOrderAssignmentCrud.getDeliveryOrderAssignmentByIdDeliveryOrderActive(deliveryOrder.getId(), true);
+
+                if (activeAssignment != null) {
+                    DeliveryPerson prevDeliveryPerson = deliveryPersonCrud.findById(activeAssignment.getDeliveryPerson().getId()).orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND,"El repartidor de la asignación activa no existe."));
+                    prevDeliveryPerson.setAvailable(true);
+                    //ASIGNAR AUTOMATICAMENTE A OTRA ORDEN
+                    activeAssignment.setActive(false);
+                    try {
+                        deliveryOrderAssignmentCrud.save(activeAssignment);
+                        deliveryPersonCrud.save(prevDeliveryPerson);
+                        log.info("Repartidor con ID: " + prevDeliveryPerson.getId() + " fue desocupado.");
+                        log.info("Asignacion Orden de Entrega con Id: " + activeAssignment.getId() + " fue desactivado.");
+                    } catch (Exception exception) {
+                        throw new BusinessException(HttpStatus.BAD_REQUEST, "Error al actualizar un Asignacion Orden de Entrega");
+                    }
+                }
+            }else{
+                throw new BusinessException(HttpStatus.NOT_FOUND,"La Orden de Entrega ya fue asignada a otro repartidor.");
+            }
+        }
+    }
+
+    public void autoAssignmentDeliveryOrder(DeliveryOrder deliveryOrder) {
+        // Repartidores disponibles por prioridad
+        List<DeliveryPerson> deliveryPersonList = deliveryOrderAssignmentCrud.getDeliveryPersonByPriority();
+        if (!deliveryPersonList.isEmpty()){
+            for (DeliveryPerson deliveryPerson : deliveryPersonList) {
+                NewDeliveryOrderAssignmentDto newDeliveryOrderAssignmentDto = NewDeliveryOrderAssignmentDto.builder()
+                        .idDeliveryOrder(deliveryOrder.getId())
+                        .idDeliveryPerson(deliveryPerson.getId())
+                        .build();
+
+                try {
+                    // Intentamos crear la asignación
+                    createDeliveryOrderAssignment(newDeliveryOrderAssignmentDto, true);
+
+                    // Si llegamos aquí, se creó correctamente → salir del bucle
+                    log.info("Asignación automática creada con éxito para repartidor {}", deliveryPerson.getId());
+                    break;
+
+                } catch (Exception exception) {
+                    // Si falla con este repartidor, seguimos con el siguiente
+                    log.warn("Error al asignar con repartidor {}: {}", deliveryPerson.getId(), exception.getMessage());
+                }
+            }
+        }else{
+            throw new BusinessException(HttpStatus.BAD_REQUEST, "No hay repartidores disponibles en este momento, asignaremos su orden lo más pronto posible.");
+        }
+    }
+/*
+    public void autoAssignmentDeliveryPerson(DeliveryPerson deliveryPerson) {
+        // Repartidores disponibles por prioridad
+        List<DeliveryPerson> deliveryPersonList = deliveryOrderAssignmentCrud.getDeliveryPersonByPriority();
+        if (!deliveryPersonList.isEmpty()){
+            for (DeliveryPerson deliveryPerson : deliveryPersonList) {
+                NewDeliveryOrderAssignmentDto newDeliveryOrderAssignmentDto = NewDeliveryOrderAssignmentDto.builder()
+                        .idDeliveryOrder(deliveryOrder.getId())
+                        .idDeliveryPerson(deliveryPerson.getId())
+                        .build();
+
+                try {
+                    // Intentamos crear la asignación
+                    createDeliveryOrderAssignment(newDeliveryOrderAssignmentDto, true);
+
+                    // Si llegamos aquí, se creó correctamente → salir del bucle
+                    log.info("Asignación automática creada con éxito para repartidor {}", deliveryPerson.getId());
+                    break;
+
+                } catch (Exception exception) {
+                    // Si falla con este repartidor, seguimos con el siguiente
+                    log.warn("Error al asignar con repartidor {}: {}", deliveryPerson.getId(), exception.getMessage());
+                }
+            }
+        }else{
+            throw new BusinessException(HttpStatus.BAD_REQUEST, "No hay repartidores disponibles en este momento, asignaremos su orden lo más pronto posible.");
+        }
+    }
+*/
 }

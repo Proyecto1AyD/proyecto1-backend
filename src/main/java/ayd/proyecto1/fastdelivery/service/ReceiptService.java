@@ -23,8 +23,6 @@ public class ReceiptService {
 
     private final ReceiptCrud receiptCrud;
 
-
-
     public ResponseSuccessfullyDto getAllReceipt(){
 
         List<Receipt> receiptList = receiptCrud.findAll();
@@ -112,7 +110,5 @@ public class ReceiptService {
 
         return ResponseSuccessfullyDto.builder().code(HttpStatus.OK).body(receiptInfoDtoList).build();
     }
-
-
 
 }
