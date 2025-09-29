@@ -16,18 +16,16 @@ public interface ReceiptCrud extends JpaRepository<Receipt, Integer> {
     @Query(value = "select r.id, r.id_delivery_order_assignment, r.amount, r.`date` from receipt r inner join delivery_order_assignment doa on r.id_delivery_order_assignment  = doa.id where doa.id_delivery_person = ?;", nativeQuery = true)
     Optional<List<Receipt>> getByDeliveryPersonId(Integer deliveryPersonId);
 
-    @Query("""
-        SELECT ayd.proyecto1.fastdelivery.dto.response.ComissionDto(
-            r.amount,
-            doa.deliveryPersonId,
-            r.date
-        )
-        FROM Receipt r
-        INNER JOIN r.deliveryOrderAssignment doa
-        WHERE doa.deliveryPersonId = :repartidorId
-          AND r.date BETWEEN :fechaInicio AND :fechaFin
-    """)
+    @Query(value = """
+        select r.amount, doa.id_delivery_person, r.`date`  from receipt r
+                                            inner join delivery_order_assignment doa on
+                                            r.id_delivery_order_assignment = doa.id
+                                            where doa.id_delivery_person = ? and r.`date` between ? and ? ;
+    """,nativeQuery = true)
     Optional<List<ComissionDto>> getByAssignmentIdAndDate(Integer deliveryOrderAssignmentId, Date initDate, Date finishDate);
+
+    @Query(value = "select * from receipt r where id_delivery_order_assignment = ? ;",nativeQuery = true)
+    Optional<List<Receipt>> getByAssignmentId(Integer deliveryOrderAssignmentId);
 
 
 }

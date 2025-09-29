@@ -31,5 +31,12 @@ public class ReportsController implements ReportsApi {
         return new ResponseEntity<>(responseSuccessfullyDto, responseSuccessfullyDto.getCode());
     }
 
+    @Override
+    public ResponseEntity<ResponseSuccessfullyDto> getIncidentsByBusinessId(Integer businessId) {
+        log.info("GET reports/incidents/business/{business_id}");
+        ResponseSuccessfullyDto responseSuccessfullyDto = reportsService.getIncidentByBusinessId(businessId);
+        return new ResponseEntity<>(responseSuccessfullyDto,responseSuccessfullyDto.getCode());
+    }
+
 
 }

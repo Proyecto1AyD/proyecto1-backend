@@ -20,5 +20,9 @@ public interface ReportsApi {
                                                                      @PathVariable(name = "finish_date") Date finishDate);
 
 
+    @GetMapping("/incidents/business/{business_id}")
+    ResponseEntity<ResponseSuccessfullyDto> getIncidentsByBusinessId(@PathVariable(name = "business_id") Integer businessId);
+
+
 
 }
