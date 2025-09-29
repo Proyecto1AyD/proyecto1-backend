@@ -6,6 +6,7 @@ import ayd.proyecto1.fastdelivery.dto.response.ResponseSuccessfullyDto;
 import ayd.proyecto1.fastdelivery.exception.BusinessException;
 import ayd.proyecto1.fastdelivery.repository.crud.DeliveryOrderCrud;
 import ayd.proyecto1.fastdelivery.repository.entities.DeliveryOrder;
+import ayd.proyecto1.fastdelivery.repository.entities.DeliveryOrderAssignment;
 import ayd.proyecto1.fastdelivery.repository.entities.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,8 @@ public class DeliveryOrderService {
 
     private final DeliveryOrderStatusService deliveryOrderStatusService;
 
+    private final DeliveryOrderAssignmentService deliveryOrderAssignmentService;
+
     private static final Integer ORDER_CREATED_STATUS = 1;
 
     private static final Integer ORDER_ASSIGNED_STATUS = 2;
@@ -40,10 +43,16 @@ public class DeliveryOrderService {
         deliveryOrder.setTime(newDeliveryOrderDto.getTime());
         deliveryOrder.setDeliveryOrderStatus(deliveryOrderStatusService.getDeliveryOrderStatusByIdDeliveryOrderStatus(ORDER_CREATED_STATUS));
         deliveryOrder.setDescription(newDeliveryOrderDto.getDescription());
-        //ASIGNAR A REPARTIDORES
         try{
-            deliveryOrderCrud.save(deliveryOrder);
-            return ResponseSuccessfullyDto.builder().code(HttpStatus.CREATED).message("Orden de Entrega creada exitosamente").build();
+            DeliveryOrder deliveryOrderSaved = deliveryOrderCrud.save(deliveryOrder);
+            String messageResponse = "Orden de Entrega creada exitosamente";
+            try {
+                deliveryOrderAssignmentService.autoAssignmentDeliveryOrder(deliveryOrderSaved);
+            } catch (Exception exception) {
+                log.warn(exception.getMessage());
+                messageResponse += "No hay repartidores disponibles en este momento, asignaremos su orden lo más pronto posible.";
+            }
+            return ResponseSuccessfullyDto.builder().code(HttpStatus.CREATED).message(messageResponse).build();
         }catch (Exception exception){
             throw new BusinessException(HttpStatus.BAD_REQUEST,"Error al guardar la Orden de Entrega");
         }
