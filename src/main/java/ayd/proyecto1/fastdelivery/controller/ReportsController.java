@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Date;
+
 @Slf4j
 @RequiredArgsConstructor
 @RestController
@@ -22,6 +24,12 @@ public class ReportsController implements ReportsApi {
         return new ResponseEntity<>(responseSuccessfullyDto,responseSuccessfullyDto.getCode());
     }
 
+    @Override
+    public ResponseEntity<ResponseSuccessfullyDto> getByAssignmentIdAndDate(Integer deliveryId, Date initDate, Date finishDate) {
+        log.info("GET reports/commission/delivery_person/{delivery_person_id}/{init_date}/{finish_date}");
+        ResponseSuccessfullyDto responseSuccessfullyDto = reportsService.getByAssignmentIdAndDate(deliveryId,initDate,finishDate);
+        return new ResponseEntity<>(responseSuccessfullyDto, responseSuccessfullyDto.getCode());
+    }
 
 
 }
